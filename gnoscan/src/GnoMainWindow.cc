@@ -340,18 +340,31 @@ namespace gnomain {
   
   
   void GnoMainWindow::displayHelp(void) {
-    pthread_t helpThread;
-    char helpPath[] = "/usr/bin/gnome-help-browser /home/baueran/Development/gnoscan/doc/index.html";
-
     try {
-      if (pthread_create(&helpThread, NULL, callHelp, &helpPath) != 0)
+      if (pthread_mutex_lock(&lock) != 0) {
 	throw PThreadException();
+      }
+      else {
+	pthread_t helpThread;
+	char helpPath[] = "/usr/bin/gnome-help-browser /home/baueran/Development/gnoscan/doc/index.html";
+	
+	// Show help browser
+	if (pthread_create(&helpThread, NULL, callHelp, &helpPath) != 0) {
+	  pthread_mutex_unlock(&lock);
+	  throw PThreadException();
+	}
+	else {
+	  if (pthread_mutex_unlock(&lock) != 0)
+	    throw PThreadException();
+	}
+      }
     }
     catch (...) {
       throw;
     }
   }
-
+  
+  
   void GnoMainWindow::displayLicenseBox(void) {
     statusBar->pop(statusBar->get_context_id((string)PACKAGE));
     statusBar->push(statusBar->get_context_id((string)PACKAGE), "GnoScan License");
@@ -379,16 +392,8 @@ namespace gnomain {
   
 
   void* callHelp(void* location) {
-    if (pthread_mutex_lock(&lock) != 0)
-      throw PThreadException();
-    else {
-      system((char*)location);
-
-      if (pthread_mutex_unlock(&lock) != 0)
-        throw PThreadException();
-    }
-
+    system((char*)location);
     return (void*)0;
   }
-
+  
 }

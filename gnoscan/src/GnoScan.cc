@@ -121,6 +121,10 @@ int main(int argc, char *argv[])
     cerr << (string)PACKAGE << ": Error: MalformedPrefsFile was thrown. Check the syntax of your rcfile containing the programs preferences." << endl;
     return(-1);
   }
+  catch (gnomain::PThreadException) {
+    cerr << (string)PACKAGE << ": Error: Exception occured while trying to (un)lock mutex. Consider reporting a bug." << endl;
+    return(-1);
+  }
   catch (...) {
     cerr << (string)PACKAGE << ": Error: Unknown exception was thrown. Consider reporting a bug." << endl;
     return(-1);

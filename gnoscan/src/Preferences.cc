@@ -39,6 +39,7 @@ namespace pref {
     sourcePort = 0;
     extraInfo = TRUE;
     specificPort = FALSE;
+    timeOuts = 3;
 
     // Load settings
     if (prefsFile) {
