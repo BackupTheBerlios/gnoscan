@@ -1,6 +1,13 @@
 GnoScan ChangeLog
 -=-=-=-=-=-=-=-=-
 
+Sun Feb 11 16:22:34 GMT+1 2001  Andreas Bauer  <baueran@users.berlios.de>
+
+  - Added load/save of preferences to the rcfile
+
+  - Binding to low port numbers is now only allowed by user 'root'
+
+
 Sat Feb 10 14:17:15 GMT+1 2001  Andreas Bauer  <baueran@users.berlios.de>
 
   - Found and fixed the annoying bug that caused a Gtk error on exit
