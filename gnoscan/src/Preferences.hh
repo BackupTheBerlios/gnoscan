@@ -32,6 +32,7 @@ namespace pref {
     bool extraInfo;
     bool specificPort;
     int sourcePort;
+    int timeOuts;
     vector<string> prefsFileContent;
 
     // Functions
@@ -50,6 +51,8 @@ namespace pref {
     bool extraInfoValue(void);
     void setExtraInfoValue(bool);
     string getFileName(void);
+    int maxTimeOuts(void);
+    void setMaxTimeOuts(int);
   };
 
   // Exceptions

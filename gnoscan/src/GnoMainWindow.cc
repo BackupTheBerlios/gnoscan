@@ -99,7 +99,7 @@ namespace gnomain {
       char *netmasks[5] = { "<check only specified host>", "255.255.255.0", "255.255.0.0", "255.0.0.0", "" };
       Gtk::HBox* netmaskHBox = manage(new Gtk::HBox());
       Gtk::Label* netmaskLabel = manage(new Gtk::Label("Netmask:"));
-      Gtk::Combo* netmaskCombo = manage(new Gtk::Combo());
+      netmaskCombo = manage(new Gtk::Combo());
       netmaskHBox->pack_start(*netmaskLabel, FALSE, FALSE, STD_PADDING);
       netmaskHBox->pack_start(*netmaskCombo, TRUE, TRUE, STD_PADDING);
       netmaskCombo->set_popdown_strings(netmasks);
@@ -265,12 +265,13 @@ namespace gnomain {
 	sourcePort = -1;
 
       // This scans the host/network and returns the results
-      const vector<scan::scanResult>* results = scannerObj.scan(ops.start->get_value_as_int(),   // Start port
-								ops.end->get_value_as_int(),     // End port
-								sourcePort,                      // Source port
-							        prefs->extraInfoValue(),         // Extra info?
-								ops.server->get_text(),          // Host
-								"");                             // Netmask
+      const vector<scan::scanResult>* results = scannerObj.scan(ops.start->get_value_as_int(),           // Start port
+								ops.end->get_value_as_int(),             // End port
+								sourcePort,                              // Source port
+							        prefs->extraInfoValue(),                 // Extra info?
+								ops.server->get_text(),                  // Host
+								netmaskCombo->get_entry()->get_text(),   // Netmask
+								prefs->maxTimeOuts());                   // Max time-outs
 
       vector<scan::scanResult>::const_iterator curResult = results->begin();
       vector<string> listItems;

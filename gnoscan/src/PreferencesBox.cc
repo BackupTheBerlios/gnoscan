@@ -39,12 +39,13 @@ PreferencesBox::PreferencesBox(pref::Preferences* newPrefs) {
   set_policy(FALSE, FALSE, FALSE);
   set_title ("Options");
   set_border_width(0);
-  set_usize(320, 200);
+  set_usize(320, 240);
   init();
 }
 
 
 void PreferencesBox::init(void) {
+  // Source port definition
   Gtk::HBox* sourceHBox = manage(new Gtk::HBox());
   Gtk::VBox* sourceVBox = manage(new Gtk::VBox());
   Gtk::HBox* aPortHBox = manage(new Gtk::HBox());
@@ -54,22 +55,35 @@ void PreferencesBox::init(void) {
   aPort = manage(new Gtk::RadioButton(gr, "Use a specific port:"));
   noPort->set_active(!(prefs->useSpecificSourcePort()));
   aPort->set_active(prefs->useSpecificSourcePort());
-  Gtk::Adjustment* spinbutton_adj = manage(new Gtk::Adjustment(prefs->sourcePortValue(), 0, 10000, 1, 10, 10));
-  sourcePortSpin = manage(new Gtk::SpinButton(*spinbutton_adj, 1, 0));
-  extraButton = manage(new Gtk::CheckButton("Display extra information", 0.0, 0.5));
-  extraButton->set_active(prefs->extraInfoValue());
+  Gtk::Adjustment* spinbutton2_adj = manage(new Gtk::Adjustment(prefs->sourcePortValue(), 0, 10000, 1, 10, 10));
+  sourcePortSpin = manage(new Gtk::SpinButton(*spinbutton2_adj, 1, 0));
   sourcePortSpin->set_usize(60, 22);
   sourcePortSpin->set_numeric(TRUE);
   aPortHBox->pack_start(*aPort, FALSE, FALSE, 0);
   aPortHBox->pack_start(*sourcePortSpin, FALSE, FALSE, 0);
-  sourceVBox->pack_start(*noPort);
-  sourceVBox->pack_start(*aPortHBox);
+  sourceVBox->pack_start(*noPort, TRUE, TRUE);
+  sourceVBox->pack_start(*aPortHBox, TRUE, TRUE, STD_PADDING_HALF);
   sourceHBox->pack_start(*sourceVBox, TRUE, TRUE, STD_PADDING);
   sourceFrame->add(*sourceHBox);
 
+  // Timeout
+  Gtk::HBox* timeOutHBox = manage(new Gtk::HBox());
+  Gtk::Label* timeOutLabel = manage(new Gtk::Label("Max number of time-outs:"));
+  Gtk::Adjustment* spinbutton_adj = manage(new Gtk::Adjustment(prefs->maxTimeOuts(), 0, 10000, 1, 10, 10));
+  maxTimeOuts = manage(new Gtk::SpinButton(*spinbutton_adj, 1, 0));
+  maxTimeOuts->set_usize(60, 22);
+  maxTimeOuts->set_numeric(TRUE);
+  timeOutHBox->pack_start(*timeOutLabel, FALSE, FALSE);
+  timeOutHBox->pack_start(*maxTimeOuts, FALSE, FALSE, STD_PADDING_HALF);
+
+  // Extra information
+  extraButton = manage(new Gtk::CheckButton("Display extra information", 0.0, 0.5));
+  extraButton->set_active(prefs->extraInfoValue());
+
   // Put together and show the dialog controls
   Gtk::VBox* mainVBox = get_vbox();
-  mainVBox->pack_start(*sourceFrame);
+  mainVBox->pack_start(*sourceFrame, TRUE, TRUE, STD_PADDING_HALF);
+  mainVBox->pack_start(*timeOutHBox);
   mainVBox->pack_start(*extraButton);
   
   // Add buttons
@@ -88,5 +102,6 @@ void PreferencesBox::buttonClicked(int button) {
     prefs->setUseSpecificSourcePort(aPort->get_active());
     prefs->setSourcePortValue(sourcePortSpin->get_value_as_int());
     prefs->setExtraInfoValue(extraButton->get_active());
+    prefs->setMaxTimeOuts(maxTimeOuts->get_value_as_int());
   }
 }

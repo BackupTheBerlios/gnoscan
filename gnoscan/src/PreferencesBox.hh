@@ -33,6 +33,7 @@ private:
   Gtk::RadioButton* aPort;
   Gtk::SpinButton* sourcePortSpin;
   Gtk::CheckButton* extraButton;
+  Gtk::SpinButton* maxTimeOuts;
 
   // Functions
   void init(void);

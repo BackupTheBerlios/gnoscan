@@ -1,6 +1,11 @@
 GnoScan ChangeLog
 -=-=-=-=-=-=-=-=-
 
+Mon Feb 12 17:05:16 GMT+1 2001  Andreas Bauer  <baueran@users.berlios.de>
+
+  - Implemented max. number of time-outs and added it to the options dialog
+
+
 Sun Feb 11 16:22:34 GMT+1 2001  Andreas Bauer  <baueran@users.berlios.de>
 
   - Added time-out for connect() call

@@ -35,6 +35,7 @@
 #include <gtk--/entry.h>
 #include <gtk--/main.h>
 #include <gtk--/clist.h>
+#include <gtk--/combo.h>
 #include "LicenseBox.hh"
 #include "TcpScan.hh"
 #include "Preferences.hh"
@@ -54,6 +55,7 @@ namespace gnomain {
     vector<Gnome::UI::Info> menuFile;
     vector<Gnome::UI::Info> menuEdit;
     vector<Gnome::UI::Info> menuHelp;
+    Gtk::Combo* netmaskCombo;
     Gtk::Statusbar* statusBar;
     Gtk::CList* scanCList;
     scan::TcpScan scannerObj;

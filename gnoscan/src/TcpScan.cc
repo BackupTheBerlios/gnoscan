@@ -43,6 +43,7 @@ extern "C" {
 namespace scan {
 
   TcpScan::TcpScan() {
+    timeouts = 0;
   }
   
   
@@ -50,7 +51,13 @@ namespace scan {
   }
   
   
-  vector<scanResult>* TcpScan::scan(const int start, const int end, const int sourcePort, const bool info, const string server, const string netmask) {
+  vector<scanResult>* TcpScan::scan(const int start,
+				    const int end,
+				    const int sourcePort,
+				    const bool info,
+				    const string server,
+				    const string netmask,
+				    const int maxTimeOuts) {
     timeval timeOut;
     fd_set readSockets;
     int mySocket = 0, z = 0;
@@ -77,9 +84,11 @@ namespace scan {
 	throw SocketFailed();
 	break;
       }
-      else
+      else {
+	// Try to resolve host name
 	myHost = gethostbyname(server.c_str());
-
+      }
+      
       if (!myHost)
 	throw DnsError();
       else {
@@ -97,27 +106,33 @@ namespace scan {
 	  // Specifiy source port if given
 	  if (sourcePort != -1) {
 	    source.sin_port = htons(sourcePort);
-
+	    
 	    do {
 	      z = bind(mySocket, (const sockaddr*)&source, sizeof(source));
 	    } while(z);
 	  }
-
-	  // Use alarm to time out after 4 seconds
+	
+	  // If too many timeouts occur, assume the host is not reachable and quit scanning process
+	  if (timeouts >= maxTimeOuts) {
+	    timeouts = 0;
+	    break;
+	  }
+  
+	  // Use alarm to time out after 3 seconds
 	  sigact.sa_handler = connectAlarm;
 	  sigemptyset(&sigact.sa_mask);
 	  sigact.sa_flags = 0;
-
+	  
 	  if (sigaction(SIGALRM, &sigact, NULL) < 0) {
 	    cerr << (string)PACKAGE << ": Error: Problems with alarm signal. Please report a bug." << endl;
 	    throw IOException();
 	  }
-
-	  alarm(4);
-	
+	  
+	  alarm(3);
+	  
 	  // Try to open the port
 	  if (connect(mySocket, (const sockaddr*)&dest, sizeof(dest)) == 0) {
-
+	    
 	    // Try to get additional information on the open port
 	    if (info) {
 	      FD_SET(mySocket, &readSockets);
@@ -140,7 +155,7 @@ namespace scan {
 	    }
 	    else
 	      extraInfo = "";
-
+	    
 	    // Store the results
 	    portname = getservbyport(htons(i), "tcp");
 	    
@@ -157,15 +172,15 @@ namespace scan {
 	      result.port = i;
 	      result.info = extraInfo;
 	    }
-
+	    
 	    results.push_back(result);
 	  }
-
+	  
 	  // Close connection, regardless of errors,
 	  // cause most sockets are created without actually getting connected to ports on the host
 	  shutdown(mySocket, 2);
 	  close(mySocket);
-
+	  
 	  // Clean-up
 	  alarm(0);
 	  portname = NULL;
@@ -179,12 +194,12 @@ namespace scan {
 	}
       }
     }
-
+    
     return &results;
   }
-
+  
   void connectAlarm(int signo) {
-    cout << "Network unreachable?" << endl;
+    timeouts++;
     return;
   }
 

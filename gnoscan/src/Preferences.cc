@@ -50,6 +50,9 @@ namespace pref {
 	  if (curLine.find("SOURCE_PORT=", 0) == 0) {
 	    sourcePort = atoi( (*(getPrefValues(curLine)).begin()).c_str() );
 	  }
+	  else if (curLine.find("TIMEOUTS=", 0) == 0) {
+	    timeOuts = atoi( (*(getPrefValues(curLine)).begin()).c_str() );
+	  }
 	  else if (curLine.find("SPECIFIC_PORT=", 0) == 0) {
 	    if (*(getPrefValues(curLine)).begin() == "yes")
 	      specificPort = TRUE;
@@ -138,6 +141,11 @@ namespace pref {
 	  sourceStream << sourcePort << ends;
 	  setPrefValue(curLine, sourceStream.str());
 	}
+	else if ((*curLine).find("TIMEOUTS=", 0) == 0) {
+	  std::strstream sourceStream;
+	  sourceStream << timeOuts << ends;
+	  setPrefValue(curLine, sourceStream.str());
+	}
 	else if ((*curLine).find("EXTRA_INFO=", 0) == 0) {
 	  if (extraInfo)
 	    setPrefValue(curLine, "yes");
@@ -212,6 +220,16 @@ namespace pref {
 
   string Preferences::getFileName(void) {
     return fileName;
+  }
+
+
+  int Preferences::maxTimeOuts(void) {
+    return timeOuts;
+  }
+
+
+  void Preferences::setMaxTimeOuts(int newVal) {
+    timeOuts = newVal;
   }
 
 }
