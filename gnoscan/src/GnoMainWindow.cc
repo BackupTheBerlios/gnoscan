@@ -413,13 +413,23 @@ namespace gnomain {
       sourcePort = ((optionsSummary*)newOps)->sourcePort;
 
     try {
-      results = scannerObj.scan(((optionsSummary*)newOps)->start,           // Start port
-				((optionsSummary*)newOps)->end,             // End port
-				sourcePort,                                 // Source port, -1 if none was specified
-				((optionsSummary*)newOps)->extraInfo,       // Extra info?
-				((optionsSummary*)newOps)->server,          // Host
-				((optionsSummary*)newOps)->netmask,         // Netmask
-				((optionsSummary*)newOps)->timeOuts);       // Max time-outs
+      if ( ((optionsSummary*)newOps)->netmask.find("255") == 0 ) {
+	results = scannerObj.scanNetmask(((optionsSummary*)newOps)->start,           // Start port
+					 ((optionsSummary*)newOps)->end,             // End port
+					 sourcePort,                                 // Source port, -1 if none was specified
+					 ((optionsSummary*)newOps)->extraInfo,       // Extra info?
+					 ((optionsSummary*)newOps)->server,          // Host
+					 ((optionsSummary*)newOps)->netmask,         // Netmask
+					 ((optionsSummary*)newOps)->timeOuts);       // Max time-outs
+      }
+      else {
+	results = scannerObj.scan(((optionsSummary*)newOps)->start,           // Start port
+				  ((optionsSummary*)newOps)->end,             // End port
+				  sourcePort,                                 // Source port, -1 if none was specified
+				  ((optionsSummary*)newOps)->extraInfo,       // Extra info?
+				  ((optionsSummary*)newOps)->server,          // Host
+				  ((optionsSummary*)newOps)->timeOuts);       // Max time-outs
+      }
     }
     catch (scan::DnsError) {
       return((void*)DNS_EXCEPTION);

@@ -46,7 +46,8 @@ namespace scan {
     TcpScan();
     ~TcpScan();
   
-    vector<scanResult>* scan(const int, const int, const int, const bool, const string, const string, const int);
+    vector<scanResult>* scan(const int, const int, const int, const bool, const string, const int);
+    vector<scanResult>* scanNetmask(const int, const int, const int, const bool, const string, const string, const int);
   };
 
   void connectAlarm(int);

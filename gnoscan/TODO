@@ -4,10 +4,6 @@ GnoScan TODO
 - Add checking for -pthreads to configure.in, though it's already checked
   by gtk-- and gnome--
 
-- Add creation of config-files (if none exists already)
-
-- Add netmask scanning (see feature above, otherwise it gets SLOW)
-
 - Add man page and installation documents
 
 - Implement GNU's gettext stuff
