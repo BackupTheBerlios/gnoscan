@@ -60,7 +60,32 @@ using SigC::bind;
 
 namespace gnomain {
 
+  // Global variables, necessary due to c-style pthreads
   pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
+  pthread_mutex_t scanLock = PTHREAD_MUTEX_INITIALIZER;
+  vector<scan::scanResult>* results;
+  Gtk::CList* scanCList;
+  Gtk::Statusbar* statusBar;
+  unsigned int statusBarID;
+  scan::TcpScan scannerObj;
+  pref::Preferences* prefs;
+  scanOptions options;
+  pthread_t scanThread, resultThread;
+	
+  // Temporary structure to pass on a lot of values to the scan process
+  // It is only used by startScan() and the according thread routine
+  struct optionsSummary {
+    string server;
+    string netmask;
+    int start;
+    int end;
+    int sourcePort;
+    bool useSourcePort;
+    bool extraInfo;
+    int timeOuts;
+  };
+  optionsSummary allOps;
+  
 
   GnoMainWindow::GnoMainWindow(string name, pref::Preferences* newPrefs): Gnome::App(name, name)
   {
@@ -87,8 +112,6 @@ namespace gnomain {
   
 
   void GnoMainWindow::init(void) {
-    scanOptions options;
-
     set_policy(FALSE, TRUE, FALSE);
     set_default_size(appWidth, appHeight);
 
@@ -104,7 +127,7 @@ namespace gnomain {
       char *netmasks[5] = { "<check only specified host>", "255.255.255.0", "255.255.0.0", "255.0.0.0", "" };
       Gtk::HBox* netmaskHBox = manage(new Gtk::HBox());
       Gtk::Label* netmaskLabel = manage(new Gtk::Label("Netmask:"));
-      netmaskCombo = manage(new Gtk::Combo());
+      Gtk::Combo* netmaskCombo = manage(new Gtk::Combo());
       netmaskHBox->pack_start(*netmaskLabel, FALSE, FALSE, STD_PADDING);
       netmaskHBox->pack_start(*netmaskCombo, TRUE, TRUE, STD_PADDING);
       netmaskCombo->set_popdown_strings(netmasks);
@@ -179,7 +202,8 @@ namespace gnomain {
       
       // Status bar
       statusBar = new Gtk::Statusbar();
-      statusBar->push(statusBar->get_context_id((string)PACKAGE), "Ready");
+      statusBarID = statusBar->get_context_id((string)PACKAGE);
+      statusBar->push( statusBarID, "Ready" );
 
       // Draw and arrange all widgets
       Gtk::VBox* vBox = manage(new Gtk::VBox());
@@ -196,7 +220,8 @@ namespace gnomain {
       options.start = portStart;
       options.end = portEnd;
       options.server = serverEntry;
-      
+      options.netmask = netmaskCombo;
+
       // Set button-defaults and connect signals
       scanButton->set_flags(GTK_CAN_DEFAULT);
       cancelButton->set_flags(GTK_CAN_DEFAULT);
@@ -211,44 +236,48 @@ namespace gnomain {
   
   
   void GnoMainWindow::installMenus(void) {
-    // Help menu
-    menuHelp.push_back(Gnome::UI::Item("Help...", slot(this, &GnoMainWindow::displayHelp)));
-    menuHelp.push_back(Gnome::UI::Separator());
-    menuHelp.push_back(Gnome::UI::Item("License...", slot(this, &GnoMainWindow::displayLicenseBox)));
-    menuHelp.push_back(Gnome::MenuItems::About(slot(this, &GnoMainWindow::displayAboutBox)));
-    
-    // Edit menu
-    menuEdit.push_back(Gnome::MenuItems::Cut());
-    menuEdit.push_back(Gnome::MenuItems::Copy());
-    menuEdit.push_back(Gnome::MenuItems::Paste());
-    menuEdit.push_back(Gnome::UI::Separator());
-    menuEdit.push_back(Gnome::MenuItems::Properties(slot(this, &GnoMainWindow::displayOptions)));
-    
-    // File menu
-    menuFile.push_back(Gnome::MenuItems::Exit(slot(this, &GnoMainWindow::closeWindowAndSave)));
-    
-    // Menu bar
-    menuBar.push_back(Gnome::Menus::File(menuFile));
-    menuBar.push_back(Gnome::Menus::Edit(menuEdit));
-    menuBar.push_back(Gnome::Menus::Help(menuHelp));
-    
-    // Draw handle box with menu bar and menu items
-    create_menus(menuBar);
+    try {
+      // Help menu
+      menuHelp.push_back(Gnome::UI::Item("Help...", slot(this, &GnoMainWindow::displayHelp)));
+      menuHelp.push_back(Gnome::UI::Separator());
+      menuHelp.push_back(Gnome::UI::Item("License...", slot(this, &GnoMainWindow::displayLicenseBox)));
+      menuHelp.push_back(Gnome::MenuItems::About(slot(this, &GnoMainWindow::displayAboutBox)));
+      
+      // Edit menu
+      menuEdit.push_back(Gnome::MenuItems::Cut());
+      menuEdit.push_back(Gnome::MenuItems::Copy());
+      menuEdit.push_back(Gnome::MenuItems::Paste());
+      menuEdit.push_back(Gnome::UI::Separator());
+      menuEdit.push_back(Gnome::MenuItems::Properties(slot(this, &GnoMainWindow::displayOptions)));
+      
+      // File menu
+      menuFile.push_back(Gnome::MenuItems::Exit(slot(this, &GnoMainWindow::closeWindowAndSave)));
+      
+      // Menu bar
+      menuBar.push_back(Gnome::Menus::File(menuFile));
+      menuBar.push_back(Gnome::Menus::Edit(menuEdit));
+      menuBar.push_back(Gnome::Menus::Help(menuHelp));
+      
+      // Draw handle box with menu bar and menu items
+      create_menus(menuBar);
+    }
+    catch (...) {
+      throw;
+    }
   }
   
   
   void GnoMainWindow::startScan(scanOptions ops) {
     string serverName = ops.server->get_text();
-    int sourcePort = 0;
 
     // Change GUI
     scanCList->rows().clear();
-    statusBar->pop(statusBar->get_context_id((string)PACKAGE));
-    statusBar->push(statusBar->get_context_id((string)PACKAGE), "Scanning...");
+    statusBar->pop(statusBarID);
+    statusBar->push(statusBarID, "Scanning...");
 
     // Check if server was specified, etc.
     if (!serverName.length()) {
-      Gnome::Dialogs::error("Please specifiy the server first.");
+      Gnome::Dialogs::error("You have not specified a host to scan.");
       return;
     }
     
@@ -262,40 +291,30 @@ namespace gnomain {
       return;
     }
 
+    // Set scan options
+    allOps.server = ops.server->get_text();
+    allOps.netmask = ops.netmask->get_entry()->get_text();
+    allOps.start = ops.start->get_value_as_int();
+    allOps.end = ops.end->get_value_as_int();
+    allOps.sourcePort = prefs->sourcePortValue();
+    allOps.useSourcePort = prefs->useSpecificSourcePort();
+    allOps.extraInfo = prefs->extraInfoValue();
+    allOps.timeOuts = prefs->maxTimeOuts();
+
     try {
-      // Check whether we want to scan from a specific source port
-      if (prefs->useSpecificSourcePort())
-	sourcePort = prefs->sourcePortValue();
-      else
-	sourcePort = -1;
+      if (pthread_mutex_lock(&scanLock) != 0) {
+	throw PThreadException();
+      }
+      else {
+	// Create two threads, one scanning and one waiting for the results to put them in the main dialog
+	if ( (pthread_create(&scanThread, NULL, scanProcess, &allOps) != 0) || 
+	     (pthread_create(&resultThread, NULL, scanResultProcess, &results) != 0) ) {
+	  throw PThreadException();
+	}
 
-      // This scans the host/network and returns the results
-      const vector<scan::scanResult>* results = scannerObj.scan(ops.start->get_value_as_int(),           // Start port
-								ops.end->get_value_as_int(),             // End port
-								sourcePort,                              // Source port
-							        prefs->extraInfoValue(),                 // Extra info?
-								ops.server->get_text(),                  // Host
-								netmaskCombo->get_entry()->get_text(),   // Netmask
-								prefs->maxTimeOuts());                   // Max time-outs
-
-      vector<scan::scanResult>::const_iterator curResult = results->begin();
-      vector<string> listItems;
-      char openPort[32];  // Not nice, but more than large enough...
-      string openService;
-
-      while (curResult != results->end()) {
-	// Convert open ports and services
-	snprintf(openPort, 6, "%d", curResult->port);
-	openService = curResult->service;
-
-	// Now store all open ports, services, etc. and then display
-	listItems.push_back(curResult->host);
-	listItems.push_back(openPort);
-	listItems.push_back(openService);
-	listItems.push_back(curResult->info);
-	scanCList->rows().push_back(listItems);
-	curResult++;
-	listItems.clear();
+	if (pthread_mutex_unlock(&scanLock) != 0) {
+	  throw PThreadException();
+	}
       }
     }
     catch (scan::DnsError) {
@@ -308,7 +327,7 @@ namespace gnomain {
       throw;
     }
   }
-
+  
   
   void GnoMainWindow::closeWindow(void) {
     Gnome::Main::quit();
@@ -329,8 +348,8 @@ namespace gnomain {
     string author = "Andreas Bauer <baueran@users.berlios.de>";
     string description = "Use GnoScan to scan and secure your network.\nSee http://gnoscan.berlios.de/ for further information.";
       
-    statusBar->pop(statusBar->get_context_id((string)PACKAGE));
-    statusBar->push(statusBar->get_context_id((string)PACKAGE), "About GnoScan");
+    statusBar->pop(statusBarID);
+    statusBar->push(statusBarID, "About GnoScan");
     authors.push_back(author);
     
     Gnome::About* aboutBox = manage(new Gnome::About((string)PACKAGE, (string)VERSION, copyright, authors, description, 0));
@@ -349,7 +368,7 @@ namespace gnomain {
 	char helpPath[] = "/usr/bin/gnome-help-browser /home/baueran/Development/gnoscan/doc/index.html";
 	
 	// Show help browser
-	if (pthread_create(&helpThread, NULL, callHelp, &helpPath) != 0) {
+	if (pthread_create(&helpThread, NULL, helpProcess, &helpPath) != 0) {
 	  pthread_mutex_unlock(&lock);
 	  throw PThreadException();
 	}
@@ -366,8 +385,8 @@ namespace gnomain {
   
   
   void GnoMainWindow::displayLicenseBox(void) {
-    statusBar->pop(statusBar->get_context_id((string)PACKAGE));
-    statusBar->push(statusBar->get_context_id((string)PACKAGE), "GnoScan License");
+    statusBar->pop(statusBarID);
+    statusBar->push(statusBarID, "GnoScan License");
 
     LicenseBox* licenseBox = manage(new LicenseBox());
     licenseBox->destroy.connect(slot(this,&GnoMainWindow::destroyDialog));
@@ -385,14 +404,73 @@ namespace gnomain {
     statusBar->pop(statusBar->get_context_id((string)PACKAGE));
     statusBar->push(statusBar->get_context_id((string)PACKAGE), "Preferences");
 
-    PreferencesBox* prefs = manage(new PreferencesBox(this->prefs));
-    prefs->destroy.connect(slot(this, &GnoMainWindow::destroyDialog));    
-    prefs->run();
+    PreferencesBox* prefsBox = manage(new PreferencesBox(prefs));
+    prefsBox->destroy.connect(slot(this, &GnoMainWindow::destroyDialog));    
+    prefsBox->run();
   }
   
 
-  void* callHelp(void* location) {
+  void* helpProcess(void* location) {
     system((char*)location);
+    return (void*)0;
+  }
+
+
+  void* scanProcess(void* newOps) {
+    int sourcePort = -1;
+
+    if (((optionsSummary*)newOps)->useSourcePort)
+      sourcePort = ((optionsSummary*)newOps)->sourcePort;
+
+    results = scannerObj.scan(((optionsSummary*)newOps)->start,           // Start port
+			      ((optionsSummary*)newOps)->end,             // End port
+			      sourcePort,                                 // Source port, -1 if none was specified
+			      ((optionsSummary*)newOps)->extraInfo,       // Extra info?
+			      ((optionsSummary*)newOps)->server,          // Host
+			      ((optionsSummary*)newOps)->netmask,         // Netmask
+			      ((optionsSummary*)newOps)->timeOuts);       // Max time-outs
+    
+    return(void*)0;
+  }
+
+
+  void* scanResultProcess(void*) {
+    void* thread_result;
+
+    if (pthread_join(scanThread, &thread_result) != 0)
+      return((void*)-1);
+
+    // Lock GTK mutex
+    gdk_threads_enter();
+
+    // Now process results
+    vector<scan::scanResult>::const_iterator curResult = results->begin();
+    vector<string> listItems;
+    char openPort[32];  // Not nice, but more than large enough...
+    string openService;
+    
+    while (curResult != results->end()) {
+      // Convert open ports and services
+      snprintf(openPort, 6, "%d", curResult->port);
+      openService = curResult->service;
+      
+      // Now store all open ports, services, etc. and then display
+      listItems.push_back(curResult->host);
+      listItems.push_back(openPort);
+      listItems.push_back(openService);
+      listItems.push_back(curResult->info);
+      scanCList->rows().push_back(listItems);
+      curResult++;
+      listItems.clear();
+    }
+
+    // Change GUI
+    statusBar->pop(statusBarID);
+    statusBar->push(statusBarID, "Ready");
+
+    // Release GTK mutex
+    gdk_threads_leave();
+
     return (void*)0;
   }
   

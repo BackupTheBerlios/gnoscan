@@ -3,6 +3,23 @@ GnoScan INSTALL
 
 0. REQUIREMENTS
 
+GnoScan generally requires a Unix (-like) operating system to run, but so far
+it has only been tested with Linux. I'm sure it takes a bit of fiddling around
+by some skilled person to make this application run on other platforms.
+
+Here are the packages and features your system must provide in order to run
+and/or compile GnoScan:
+
+  - GTK
+  - Gnome
+  - Support for Posix Threads (no worries, most systems do support them)
+  - GTK--
+  - Gnome--
+
+It is recommended to install these packages in the most recent versions you can
+find.
+
+
 1. BEFORE YOU START
 
 You must have the gtk/gtkmm macros properly installed. If your GTK--

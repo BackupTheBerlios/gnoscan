@@ -47,6 +47,7 @@ namespace gnomain {
     Gtk::SpinButton* start;
     Gtk::SpinButton* end;
     Gtk::Entry* server;
+    Gtk::Combo* netmask;
   };
 
   class GnoMainWindow : public Gnome::App {
@@ -55,11 +56,6 @@ namespace gnomain {
     vector<Gnome::UI::Info> menuFile;
     vector<Gnome::UI::Info> menuEdit;
     vector<Gnome::UI::Info> menuHelp;
-    Gtk::Combo* netmaskCombo;
-    Gtk::Statusbar* statusBar;
-    Gtk::CList* scanCList;
-    scan::TcpScan scannerObj;
-    pref::Preferences* prefs;
 
     void init(void);
     void installMenus(void);
@@ -81,8 +77,11 @@ namespace gnomain {
       return 0;
     }
   };
-
-  void* callHelp(void*);
+  
+  // Processes
+  void* helpProcess(void*);
+  void* scanProcess(void*);
+  void* scanResultProcess(void*);
   class PThreadException { };
 
 }

@@ -1,6 +1,13 @@
 GnoScan ChangeLog
 -=-=-=-=-=-=-=-=-
 
+Thu Feb 15 12:00:21 GMT+1 2001  Andreas Bauer  <baueran@users.berlios.de>
+
+ - Added multi-threaded port scan
+
+ - Added gthread support to configure.in
+
+
 Tue Feb 13 16:21:11 GMT+1 2001  Andreas Bauer  <baueran@users.berlios.de>
 
   - Added help option in GnoMainWindow.cc and doc/ directory

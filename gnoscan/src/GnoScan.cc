@@ -22,6 +22,8 @@
 #include <iostream>
 #include <string>
 extern "C" {
+#include <glib.h>
+#include <gdk/gdk.h>
 #include <stdlib.h>
 #include <pwd.h>
 #include <sys/types.h>
@@ -104,6 +106,9 @@ int main(int argc, char *argv[])
      prefsFile = gnoscanrc.c_str();
 
   try {
+    // Init threads
+    g_thread_init(NULL);
+
     // Set defaults (or read) preferences
     pref::Preferences prefs(prefsFile);
 
@@ -112,7 +117,10 @@ int main(int argc, char *argv[])
 
     // Initialise main window and start message loop
     gnomain::GnoMainWindow mainWindow((string)PACKAGE, &prefs);
+    gdk_threads_enter();
     kit.run();
+    gdk_threads_leave();
+
 
     // End program
     return(0);
