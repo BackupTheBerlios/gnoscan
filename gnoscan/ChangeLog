@@ -7,6 +7,8 @@ Thu Feb 15 12:00:21 GMT+1 2001  Andreas Bauer  <baueran@users.berlios.de>
 
  - Added gthread support to configure.in
 
+ - Added more dynamic paths to help file and scan button pixmap
+
 
 Tue Feb 13 16:21:11 GMT+1 2001  Andreas Bauer  <baueran@users.berlios.de>
 

@@ -57,7 +57,6 @@ AM_PATH_GTK(1.2.7,, [
                           to be installed])
 ])
 
-
 AM_PATH_GTKMM(1.2.4, , [
             AC_MSG_ERROR([*** GTK-- >= 1.2.4 required, but it does not
                           seem to be installed])
@@ -82,4 +81,5 @@ LIBS="$LIBS `gtkmm-config --libs gthread`"
 AC_OUTPUT([Makefile
 	       macros/Makefile
 	       pixmaps/Makefile
+           doc/Makefile
            src/Makefile])

@@ -60,7 +60,8 @@ using SigC::bind;
 
 namespace gnomain {
 
-  // Global variables, necessary due to c-style pthreads
+  // Global variables, necessary due to C-style posix threads
+  string helpPath = (string)"/usr/bin/gnome-help-browser " + (string)PREFIX + (string)"/doc/gnoscan/index.html";
   pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
   pthread_mutex_t scanLock = PTHREAD_MUTEX_INITIALIZER;
   vector<scan::scanResult>* results;
@@ -71,6 +72,7 @@ namespace gnomain {
   pref::Preferences* prefs;
   scanOptions options;
   pthread_t scanThread, resultThread;
+  
 	
   // Temporary structure to pass on a lot of values to the scan process
   // It is only used by startScan() and the according thread routine
@@ -191,7 +193,7 @@ namespace gnomain {
       confirmButtonBox->set_layout(GTK_BUTTONBOX_END);
       Gtk::Separator* sep = manage(new Gtk::HSeparator()); // h-separator
       Gtk::Button* cancelButton = manage(new Gnome::StockButton(GNOME_STOCK_BUTTON_CANCEL));
-      Gtk::Pixmap* scanPixmap = manage(new Gtk::Pixmap("/usr/local/share/pixmaps/gnoscan/tb_search.xpm"));
+      Gtk::Pixmap* scanPixmap = manage(new Gtk::Pixmap((string)DATADIR + "/pixmaps/gnoscan/tb_search.xpm"));
       Gtk::Label* scanLabel = manage(new Gtk::Label("Scan"));
       scanButtonBox->pack_start(*manage(static_cast<Gtk::Widget*>(scanPixmap)));
       scanButtonBox->pack_start(*scanLabel);
@@ -354,7 +356,6 @@ namespace gnomain {
       }
       else {
 	pthread_t helpThread;
-	char helpPath[] = "/usr/bin/gnome-help-browser /home/baueran/Development/gnoscan/doc/index.html";
 	
 	// Show help browser
 	if (pthread_create(&helpThread, NULL, helpProcess, &helpPath) != 0) {
@@ -400,7 +401,7 @@ namespace gnomain {
   
 
   void* helpProcess(void* location) {
-    system((char*)location);
+    system(((string*)location)->c_str());
     return (void*)0;
   }
 
