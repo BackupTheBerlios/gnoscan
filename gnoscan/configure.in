@@ -76,6 +76,8 @@ if test $GTKMM = "no"; then
         echo "You need to have gtkmm-config in your PATH"
         exit 1
 fi
+
+dnl Round up the configuration by defining libs
 LIBS="$LIBS `gtkmm-config --libs gthread`"
 
 AC_OUTPUT([Makefile

@@ -24,21 +24,6 @@ SUBDIRS = macros src pixmaps doc
 
 EXTRA_DIST = TODO
 
-# build a distribution snapshot
-# TODO:
-# add a snap documentation target
-# check to see if there is already a previous snapshot there, and don't overwrite it!
-@MAINT@snapshot: README-snapshot maintainer-clean
-@MAINT@	@a=`date -R` ;\
-@MAINT@	echo "Last built on $$a" >> README-snapshot
-@MAINT@	@d=`pwd` ;\
-@MAINT@	d=`basename $$d` ;\
-@MAINT@	echo $$d ;\
-@MAINT@	cd .. ;\
-@MAINT@	tar -cvzf $$d-`date +%m%d%y`.tar.gz $$d ;\
-@MAINT@	mv $$d-`date +%m%d%y`.tar.gz $$d/ ;\
-@MAINT@	cd $$d
-
 @MAINT@alldist:
 @MAINT@	${MAKE} distcheck
 @MAINT@	${MAKE} dist-shar

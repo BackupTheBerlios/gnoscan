@@ -33,8 +33,44 @@ gtk/gtkmm stuff is installed in /usr then the above step should not be
 necessary. If you're not sure what to do, just run the configure script and
 wait for the complaints...
 
+
 2. CONFIGURATION
+
+If you have downloaded and installed a binary distribution of GnoScan, then
+there is no need to read the following instructions. They only describe how to
+compile GnoScan from the source files.
+
+If you have downloaded a compressed source code archive, then please proceed
+the following steps. Change to the GnoScan distribution directory (where
+the INSTALL file can be found, e.g. /home/tux/gnoscan-0.1) and run
+
+      ./configure
+
+For a list of available options for configuration, call configure with the
+--help parameter. Running configure creates a Makefile in your source code
+directory. If you like, have a look at it before you continue, though this
+should not be necessary, unless you want to have debugging information
+included or things like that.
+
 
 3. COMPILATION
 
+After configure has successfully guessed your system's specific values, you
+can compile the GnoScan source code with
+
+      make
+
+If you have not changed any of the predefined values for configure then
+GnoScan will be installed in /usr/local/bin. Become 'root' now and run
+
+      make install
+
+
 4. INVOKING GNOSCAN
+
+Now try it out! GnoScan can be started with
+
+      gnoscan
+
+on the command line. For a list of available command line options, use the
+--help switch. Enjoy GnoScan!

@@ -1,5 +1,10 @@
 GnoScan NEWS
 -=-=-=-=-=-=
 
-GnoScan 0.1 (still in development)
+GnoScan 0.1 - Development Version (Sun Feb 18 20:38:18 GMT+1 2001)
 
+  - Performs TCP/IP port scans on user-defined hosts
+
+  - A multi-threaded application
+
+  - You have the possibility to scan entire subnets by defining a netmask

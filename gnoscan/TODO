@@ -1,9 +1,8 @@
 GnoScan TODO
 -=-=-=-=-=-=
 
-- Add checking for -pthreads to configure.in, though it's already checked
-  by gtk-- and gnome--
+- Check for pthreads in configure.in
 
-- Add man page and installation documents
+- Add simple man page and installation documents
 
-- Implement GNU's gettext stuff
+- Implement GNU's gettext stuff for internationalisation
