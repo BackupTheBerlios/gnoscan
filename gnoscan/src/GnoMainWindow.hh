@@ -37,6 +37,7 @@
 #include <gtk--/clist.h>
 #include "LicenseBox.hh"
 #include "TcpScan.hh"
+#include "Preferences.hh"
 
 
 namespace gnomain {
@@ -56,6 +57,7 @@ namespace gnomain {
     Gtk::Statusbar* statusBar;
     Gtk::CList* scanCList;
     scan::TcpScan scannerObj;
+    pref::Preferences* prefs;
 
     void init(void);
     void installMenus(void);
@@ -67,7 +69,7 @@ namespace gnomain {
     void startScan(scanOptions);
 
   public:
-    GnoMainWindow(string);
+    GnoMainWindow(string, pref::Preferences*);
     ~GnoMainWindow();
     
     gint delete_event_impl(GdkEventAny*) {

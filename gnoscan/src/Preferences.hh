@@ -1,4 +1,4 @@
-// PreferencesBox.hh - source file for the GnoScan program
+// Preferences.hh - source file for the GnoScan program
 // Copyright (c) 2001  Andreas Bauer <baueran@users.berlios.de>
 //
 // This program is free software; you can redistribute it and/or modify
@@ -16,22 +16,38 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
 // USA.
 
+#ifndef PREFERENCES_HH
+#define PREFERENCES_HH
 
-#ifndef PREFERENCESBOX_HH
-#define PREFERENCESBOX_HH
+#include <list>
+#include <string>
+#include <vector>
 
-#include <gnome--.h>
-#include <gnome--/dialog.h>
-#include "Preferences.hh"
+namespace pref {
 
-class PreferencesBox : public Gnome::Dialog {
-private:
-  pref::Preferences* prefs;
-  void init(void);
+  class Preferences {
+  private:
+    // Variables
+    bool extraInfo;
+    int sourcePort;
+    vector<string> prefsFileContent;
 
-public:
-  PreferencesBox(pref::Preferences*);
-  ~PreferencesBox();
-};
+    // Functions
+    list<string> getPrefValues(string);
+    bool save(string);
+    void setPrefValue(vector<string>::iterator&, string);
+
+  public:
+    Preferences(string);
+    ~Preferences();
+    bool oneSourcePort(void);
+    bool noSourcePort(void);
+    int sourcePortValue(void);
+    bool extraInfoValue(void);
+  };
+
+  // Exceptions
+  class MalformedPrefsFile { };
+}
 
 #endif

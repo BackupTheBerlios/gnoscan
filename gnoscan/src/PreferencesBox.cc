@@ -27,13 +27,15 @@
 #include "GnoScan.hh"
 #include "GnoMainWindow.hh"
 #include "PreferencesBox.hh"
+#include "Preferences.hh"
 
 
 PreferencesBox::~PreferencesBox() {
 };
 
 
-PreferencesBox::PreferencesBox() {
+PreferencesBox::PreferencesBox(pref::Preferences* newPrefs) {
+  prefs = newPrefs;
   set_policy(false, false, false);
   set_title ("Options");
   set_border_width(0);
@@ -53,6 +55,8 @@ void PreferencesBox::init(void) {
   Gtk::Adjustment* spinbutton_adj = manage(new Gtk::Adjustment(0, 0, 10000, 1, 10, 10));
   Gtk::SpinButton* sourcePortSpin = manage(new Gtk::SpinButton(*spinbutton_adj, 1, 0));
   Gtk::CheckButton* extraButton = manage(new Gtk::CheckButton("Display extra information", 0.0, 0.5));
+  sourcePortSpin->set_usize(60, 22);
+  sourcePortSpin->set_numeric(TRUE);
   aPortHBox->pack_start(*aPort, FALSE, FALSE, 0);
   aPortHBox->pack_start(*sourcePortSpin, FALSE, FALSE, 0);
   sourceVBox->pack_start(*noPort);

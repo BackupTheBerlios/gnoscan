@@ -44,6 +44,7 @@
 #include "config.h"
 #include "GnoMainWindow.hh"
 #include "PreferencesBox.hh"
+#include "Preferences.hh"
 #include "TcpScan.hh"
 
 
@@ -52,9 +53,11 @@ using SigC::bind;
 
 namespace gnomain {
 
-  GnoMainWindow::GnoMainWindow(string name): Gnome::App(name, name)
+  GnoMainWindow::GnoMainWindow(string name, pref::Preferences* newPrefs): Gnome::App(name, name)
   {
     try {
+      prefs = newPrefs;
+
       // Initialise application and menus
       init();
       installMenus();
@@ -109,6 +112,8 @@ namespace gnomain {
       Gtk::Label* portEndLabel = manage(new Gtk::Label("End:"));
       Gtk::Adjustment* spinbutton2_adj = manage(new Gtk::Adjustment(1023, 0, 10000, 1, 10, 10));
       Gtk::SpinButton* portEnd = manage(new Gtk::SpinButton(*spinbutton2_adj, 1, 0));
+      portStart->set_numeric(TRUE);
+      portEnd->set_numeric(TRUE);
       portButtonsHBox->pack_start(*portStartLabel, TRUE, TRUE, STD_PADDING);
       portButtonsHBox->pack_start(*portStart, FALSE, TRUE, STD_PADDING);
       portButtonsHBox->pack_start(*portEndLabel, TRUE, TRUE, STD_PADDING);
@@ -242,12 +247,17 @@ namespace gnomain {
       return;
     }
 
+    if ( (ops.start->get_value_as_int() < 0) || (ops.end->get_value_as_int() < 0) ) {
+      Gnome::Dialogs::error("Only positive port numbers are valid.");
+      return;
+    }
+    
     // Main scanning process
     try {
       const vector<scan::scanResult>* results = scannerObj.scan(ops.start->get_value_as_int(),   // Start port
 								ops.end->get_value_as_int(),     // End port
-								-1,                              // Source port
-								true,                            // Extra info?
+								prefs->sourcePortValue(),        // Source port
+							        prefs->extraInfoValue(),         // Extra info?
 								ops.server->get_text(),          // Host
 								"");                             // Netmask
       vector<scan::scanResult>::const_iterator curResult = results->begin();
@@ -323,8 +333,8 @@ namespace gnomain {
     statusBar->pop(statusBar->get_context_id((string)PACKAGE));
     statusBar->push(statusBar->get_context_id((string)PACKAGE), "Preferences");
 
-    PreferencesBox* prefs = manage(new PreferencesBox());
-    prefs->destroy.connect(slot(this,&GnoMainWindow::destroyDialog));    
+    PreferencesBox* prefs = manage(new PreferencesBox(this->prefs));
+    prefs->destroy.connect(slot(this, &GnoMainWindow::destroyDialog));    
     prefs->run();
   }
   

@@ -21,19 +21,24 @@
 #include <gnome--/main.h>
 #include <iostream>
 #include <string>
+extern "C" {
+#include <stdlib.h>
+#include <pwd.h>
+#include <sys/types.h>
+}
 #ifdef HAVE_GETOPT_H
 extern "C" {
 #include <getopt.h>
 }
 #else
 extern "C" {
-#include <stdlib.h>
 #include "getopt.h"
 }
 #endif
 #include "config.h"
 #include "GnoScan.hh"
 #include "GnoMainWindow.hh"
+#include "Preferences.hh"
 
 
 using namespace std;
@@ -42,7 +47,7 @@ int main(int argc, char *argv[])
 {
   int c = 0, option_index = 0;
   extern char *optarg;
-  string gnoscanrc;
+  string gnoscanrc, prefsFile;
 
   static struct option long_options[] = {
     {"help", 0, NULL, VALUE_HELP},
@@ -58,7 +63,7 @@ int main(int argc, char *argv[])
     case VALUE_HELP:
       cout << "Use GnoScan to scan and secure your network." << endl;
       cout << endl;
-      cout << "Usage: " << PACKAGE << " [OPTION]..." << endl;
+      cout << "Usage: " << PACKAGE << " [HOSTNAME | NETWORK ADDRESS]... [OPTION]..." << endl;
       cout << endl;
       cout << "Options:" << endl;
       cout << "  -h, --help               Display this help information" << endl;
@@ -88,19 +93,36 @@ int main(int argc, char *argv[])
     }
   }
 
-  // Initialise the GnoScan kit
-  Gnome::Main kit((string)PACKAGE, (string)VERSION, argc, argv);
-  
+  // Locate .gnoscanrc depending on whether the user gave one on the command line or not
+  if (!gnoscanrc.length()) {
+    if (getenv("HOME"))
+      prefsFile = (string)getenv("HOME") + (string)"/.gnoscanrc";
+    else
+      prefsFile = (string)"/home/" + (string)getpwuid(getuid())->pw_name + (string)"/.gnoscanrc";
+  }
+  else
+     prefsFile = gnoscanrc.c_str();
+
   try {
+    // Set defaults (or read) preferences
+    pref::Preferences prefs(prefsFile);
+
+    // Initialise the GnoScan kit
+    Gnome::Main kit((string)PACKAGE, (string)VERSION, argc, argv);
+
     // Initialise main window and start message loop
-    gnomain::GnoMainWindow mainWindow((string)PACKAGE);
+    gnomain::GnoMainWindow mainWindow((string)PACKAGE, &prefs);
     kit.run();
 
     // End program
     return(0);
   }
+  catch (pref::MalformedPrefsFile) {
+    cerr << (string)PACKAGE << ": Error: MalformedPrefsFile was thrown. Check the syntax of your rcfile containing the programs preferences." << endl;
+    return(-1);
+  }
   catch (...) {
-    cerr << "Some exception was thrown. Bad luck!" << endl;
+    cerr << (string)PACKAGE << ": Error: Unknown exception was thrown. Consider reporting a bug." << endl;
     return(-1);
   }
 }
