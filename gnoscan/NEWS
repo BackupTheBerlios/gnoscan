@@ -1,7 +1,9 @@
 GnoScan NEWS
 -=-=-=-=-=-=
 
-GnoScan 0.1.1 - Development Version (still in development)
+GnoScan 0.1.1 - Development Version (Thu Feb 22 12:49:10 GMT+1 2001)
+
+  - Fixed up binary packages (RPM) of GnoScan. They do work now.
 
   - Disabled possibility of starting more than one search thread and mess
     things up that way
