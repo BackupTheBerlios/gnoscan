@@ -1,6 +1,11 @@
 GnoScan NEWS
 -=-=-=-=-=-=
 
+GnoScan 0.1.2 - Development Version (Fri Oct 19 16:34:15 GMT 2001)
+
+  - GnoScan now works with recent GTK--/Gnome--
+
+  
 GnoScan 0.1.1 - Development Version (Thu Feb 22 12:49:10 GMT+1 2001)
 
   - Fixed up binary packages (RPM) of GnoScan. They do work now.

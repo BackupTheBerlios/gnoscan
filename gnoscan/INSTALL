@@ -12,11 +12,11 @@ Here are the packages GnoScan depends on. They have to be available on your
 system:
 
   - GTK+ libraries >= 1.2.7
-  - Gnome libraries >= 1.2.0
+  - Gnome libraries >= 1.4.0
   - Posix Threads (Not to worry, most systems do support them.)
-  - GTK-- libraries >= 1.2.4
-  - Gnome-- libraries >= 1.1.12
-  - libsigc++ >= 1.0.0
+  - GTK-- libraries >= 1.2.7
+  - Gnome-- libraries >= 1.2.1
+  - libsigc++
 
 
 1. BEFORE YOU START

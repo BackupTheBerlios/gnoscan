@@ -24,7 +24,7 @@ dnl distribution terms that you use for the rest of that program.
 dnl  
 
 AC_INIT(src/GnoScan.cc)
-AM_INIT_AUTOMAKE(GnoScan, 0.1.1)
+AM_INIT_AUTOMAKE(GnoScan, 0.1.2)
 AM_MAINTAINER_MODE
 AM_ACLOCAL_INCLUDE(macros)
 AM_CONFIG_HEADER(config.h)
@@ -52,15 +52,9 @@ AC_CHECK_FUNC(getopt_long,
 	[AC_MSG_RESULT(Using included getopt header)])      
 
 dnl gtkmm and gnomemm
-AM_PATH_GTK(1.2.7,, [
-            AC_MSG_ERROR([*** GTK >= 1.2.7 required, but it does not seem
-                          to be installed])
-])
+AM_PATH_GTK(1.2.7,, [AC_MSG_ERROR([*** GTK >= 1.2.7 required, but it does not seem to be installed]) ])
 
-AM_PATH_GTKMM(1.2.4, , [
-            AC_MSG_ERROR([*** GTK-- >= 1.2.4 required, but it does not
-                          seem to be installed])
-])
+AM_PATH_GTKMM(1.2.5, , [AC_MSG_ERROR([*** GTK-- >= 1.2.5 required, but it does not seem to be installed]) ])
 AC_SUBST($GTKMM_CFLAGS)
 
 GNOME_INIT
@@ -82,7 +76,7 @@ LIBS="$LIBS `gtkmm-config --libs gthread`"
 
 AC_OUTPUT([Makefile
            gnoscan.spec
-	       macros/Makefile
-	       pixmaps/Makefile
+	   macros/Makefile
+	   pixmaps/Makefile
            doc/Makefile
            src/Makefile])

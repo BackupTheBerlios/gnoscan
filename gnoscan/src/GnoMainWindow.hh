@@ -55,7 +55,7 @@ namespace gnomain {
 
   class GnoMainWindow : public Gnome::App {
   private:
-    vector<Gnome::UI::Info> menuBar;
+    vector<Gnome::UI::SubTree> menuBar;
     vector<Gnome::UI::Info> menuFile;
     vector<Gnome::UI::Info> menuEdit;
     vector<Gnome::UI::Info> menuHelp;

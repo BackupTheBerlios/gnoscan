@@ -37,11 +37,14 @@
 #include <gtk--/combo.h>
 #include <gtk--/clist.h>
 #include <gtk--/base.h>
+#include <gtk--/menu.h>
+#include <gtk--/menubar.h>
 #include <gnome--.h>
 #include <gnome--/main.h>
 #include <gnome--/app.h>
 #include <gnome--/about.h>
 #include <gnome--/dialog.h>
+
 extern "C" {
 #include <stdlib.h>
 #include <unistd.h>
@@ -57,6 +60,7 @@ extern "C" {
 
 using SigC::slot;
 using SigC::bind;
+using namespace std;
 
 namespace gnomain {
 
