@@ -34,6 +34,7 @@ extern "C" {
 #include <fcntl.h>
 #include <stdio.h>
 #include <string.h>
+#include <signal.h>
 }
 #include "config.h"
 #include "TcpScan.hh"
@@ -59,7 +60,8 @@ namespace scan {
     string openService, extraInfo;
     hostent *myHost = NULL;
     char myBuffer[512];
-
+    struct sigaction sigact;
+	  
     // Clear previous results
     results.clear();
 
@@ -101,6 +103,18 @@ namespace scan {
 	    } while(z);
 	  }
 
+	  // Use alarm to time out after 4 seconds
+	  sigact.sa_handler = connectAlarm;
+	  sigemptyset(&sigact.sa_mask);
+	  sigact.sa_flags = 0;
+
+	  if (sigaction(SIGALRM, &sigact, NULL) < 0) {
+	    cerr << (string)PACKAGE << ": Error: Problems with alarm signal. Please report a bug." << endl;
+	    throw IOException();
+	  }
+
+	  alarm(4);
+	
 	  // Try to open the port
 	  if (connect(mySocket, (const sockaddr*)&dest, sizeof(dest)) == 0) {
 
@@ -153,17 +167,25 @@ namespace scan {
 	  close(mySocket);
 
 	  // Clean-up
+	  alarm(0);
 	  portname = NULL;
 	  myHost = NULL;
 	  mySocket = 0;
 	}
 	catch (...) {
+	  shutdown(mySocket, 2);
+	  close(mySocket);
 	  throw;
 	}
       }
     }
 
     return &results;
+  }
+
+  void connectAlarm(int signo) {
+    cout << "Network unreachable?" << endl;
+    return;
   }
 
 }

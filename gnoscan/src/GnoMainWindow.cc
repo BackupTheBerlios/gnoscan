@@ -252,7 +252,7 @@ namespace gnomain {
       return;
     }
 
-    if (prefs->sourcePortValue() < 1024 && getuid() && geteuid()) {
+    if (prefs->sourcePortValue() < 1024 && getuid() && geteuid() && prefs->useSpecificSourcePort()) {
       Gnome::Dialogs::error("Only root can bind to port number range 0 - 1023.\nCheck your preferences or restart the program as root.");
       return;
     }

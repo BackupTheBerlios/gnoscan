@@ -49,9 +49,12 @@ namespace scan {
     vector<scanResult>* scan(const int, const int, const int, const bool, const string, const string);
   };
 
+  void connectAlarm(int);
+
   // Exceptions
   class DnsError { };
   class SocketFailed { };
+  class IOException { };
 }
 
 #endif

@@ -3,6 +3,8 @@ GnoScan ChangeLog
 
 Sun Feb 11 16:22:34 GMT+1 2001  Andreas Bauer  <baueran@users.berlios.de>
 
+  - Added time-out for connect() call
+
   - Added load/save of preferences to the rcfile
 
   - Binding to low port numbers is now only allowed by user 'root'
