@@ -116,7 +116,8 @@ int main(int argc, char *argv[])
     // Set defaults (or read) preferences
     pref::Preferences prefs(prefsFile);
 
-    // Initialise the GnoScan kit
+    // Initialise the GnoScan kit with dummy values which should really be argc and argv
+    // but Gnome-- doesn't like getopt_long parameters. Anyone knows a workaround?
     Gnome::Main kit((string)PACKAGE, (string)VERSION, 1, dummyArg);
 
     // Initialise main window and start message loop

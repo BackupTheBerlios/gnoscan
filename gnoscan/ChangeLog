@@ -5,6 +5,8 @@ Sun Feb 18 12:28:14 GMT+1 2001  Andreas Bauer  <baueran@users.berlios.de>
 
  - Fixed --gnoscanrc switch so the creation of rcfiles can be implemented now
 
+ - Added automatic creation of new rcfiles
+
 
 Thu Feb 15 12:00:21 GMT+1 2001  Andreas Bauer  <baueran@users.berlios.de>
 

@@ -91,10 +91,8 @@ namespace pref {
       prefsFile.close();
     }
     else {
-      if (!create(file))
+      if (!create(fileName))
 	cerr << (string)PACKAGE << ": Error: Could not locate or create rcfile for preferences. Check file permissions and paths." << endl;
-      else
-	cout << "At this point GnoScan should have created an rcfile automatically." << endl;
     }
   }
 
@@ -140,12 +138,12 @@ namespace pref {
     if (prefsFile) {
       while ( curLine != prefsFileContent.end() ) {
 	if ((*curLine).find("SOURCE_PORT=", 0) == 0) {
-	  std::strstream sourceStream;
+	  strstream sourceStream;
 	  sourceStream << sourcePort << ends;
 	  setPrefValue(curLine, sourceStream.str());
 	}
 	else if ((*curLine).find("TIMEOUTS=", 0) == 0) {
-	  std::strstream sourceStream;
+	  strstream sourceStream;
 	  sourceStream << timeOuts << ends;
 	  setPrefValue(curLine, sourceStream.str());
 	}
@@ -162,8 +160,8 @@ namespace pref {
 	    setPrefValue(curLine, "no");
 	}
 	
-	prefsFile << *curLine << std::endl;      // Append line to preferences file
-	curLine++;                               // Onwards with the next line...
+	prefsFile << *curLine << endl;      // Append line to preferences file
+	curLine++;                          // Onwards with the next line...
       }
 
       prefsFile.close();
@@ -175,8 +173,26 @@ namespace pref {
 
 
   bool Preferences::create(string file) {
-    cout << "Inside create() function with " << file.c_str() << " as parameter." << endl;
-    return TRUE;
+    ofstream newPrefsFile(file.c_str());
+    
+    if (newPrefsFile) {
+      newPrefsFile << "SOURCE_PORT=0" << endl;
+      prefsFileContent.push_back("SOURCE_PORT=0");
+
+      newPrefsFile << "TIMEOUTS=3" << endl;
+      prefsFileContent.push_back("TIMEOUTS=3");
+
+      newPrefsFile << "EXTRA_INFO=yes" << endl;
+      prefsFileContent.push_back("EXTRA_INFO=yes");
+
+      newPrefsFile << "SPECIFIC_PORT=no" << endl;
+      prefsFileContent.push_back("SPECIFIC_PORT=no");
+
+      newPrefsFile.close();
+      return TRUE;
+    }
+    else
+      return FALSE;
   }
 
 
