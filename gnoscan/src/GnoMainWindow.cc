@@ -156,7 +156,7 @@ namespace gnomain {
       confirmButtonBox->set_layout(GTK_BUTTONBOX_END);
       Gtk::Separator* sep = manage(new Gtk::HSeparator()); // h-separator
       Gtk::Button* cancelButton = manage(new Gnome::StockButton(GNOME_STOCK_BUTTON_CANCEL));
-      Gtk::Pixmap* scanPixmap = manage(new Gtk::Pixmap("../pixmaps/tb_search.xpm"));
+      Gtk::Pixmap* scanPixmap = manage(new Gtk::Pixmap("/usr/local/share/pixmaps/gnoscan/tb_search.xpm"));
       Gtk::Label* scanLabel = manage(new Gtk::Label("Scan"));
       scanButtonBox->pack_start(*manage(static_cast<Gtk::Widget*>(scanPixmap)));
       scanButtonBox->pack_start(*scanLabel);
