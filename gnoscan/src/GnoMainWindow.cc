@@ -26,6 +26,7 @@
 #include <gtk--/entry.h>
 #include <gtk--/button.h>
 #include <gtk--/buttonbox.h>
+#include <gtk--/editable.h>
 #include <gtk--/frame.h>
 #include <gtk--/separator.h>
 #include <gtk--/spinbutton.h>
@@ -42,7 +43,9 @@
 #include <gnome--/about.h>
 #include <gnome--/dialog.h>
 extern "C" {
+#include <stdlib.h>
 #include <unistd.h>
+#include <pthread.h>
 #include <sys/types.h>
 }
 #include "config.h"
@@ -56,6 +59,8 @@ using SigC::slot;
 using SigC::bind;
 
 namespace gnomain {
+
+  pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
 
   GnoMainWindow::GnoMainWindow(string name, pref::Preferences* newPrefs): Gnome::App(name, name)
   {
@@ -207,7 +212,7 @@ namespace gnomain {
   
   void GnoMainWindow::installMenus(void) {
     // Help menu
-    menuHelp.push_back(Gnome::UI::Item("Help..."));
+    menuHelp.push_back(Gnome::UI::Item("Help...", slot(this, &GnoMainWindow::displayHelp)));
     menuHelp.push_back(Gnome::UI::Separator());
     menuHelp.push_back(Gnome::UI::Item("License...", slot(this, &GnoMainWindow::displayLicenseBox)));
     menuHelp.push_back(Gnome::MenuItems::About(slot(this, &GnoMainWindow::displayAboutBox)));
@@ -334,6 +339,19 @@ namespace gnomain {
   }
   
   
+  void GnoMainWindow::displayHelp(void) {
+    pthread_t helpThread;
+    char helpPath[] = "/usr/bin/gnome-help-browser /home/baueran/Development/gnoscan/doc/index.html";
+
+    try {
+      if (pthread_create(&helpThread, NULL, callHelp, &helpPath) != 0)
+	throw PThreadException();
+    }
+    catch (...) {
+      throw;
+    }
+  }
+
   void GnoMainWindow::displayLicenseBox(void) {
     statusBar->pop(statusBar->get_context_id((string)PACKAGE));
     statusBar->push(statusBar->get_context_id((string)PACKAGE), "GnoScan License");
@@ -359,4 +377,18 @@ namespace gnomain {
     prefs->run();
   }
   
+
+  void* callHelp(void* location) {
+    if (pthread_mutex_lock(&lock) != 0)
+      throw PThreadException();
+    else {
+      system((char*)location);
+
+      if (pthread_mutex_unlock(&lock) != 0)
+        throw PThreadException();
+    }
+
+    return (void*)0;
+  }
+
 }

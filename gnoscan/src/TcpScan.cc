@@ -42,6 +42,8 @@ extern "C" {
 
 namespace scan {
 
+  static int timeouts;
+
   TcpScan::TcpScan() {
     timeouts = 0;
   }
@@ -198,6 +200,7 @@ namespace scan {
     return &results;
   }
   
+
   void connectAlarm(int signo) {
     timeouts++;
     return;

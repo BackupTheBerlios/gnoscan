@@ -49,7 +49,6 @@ namespace scan {
     vector<scanResult>* scan(const int, const int, const int, const bool, const string, const string, const int);
   };
 
-  static int timeouts;
   void connectAlarm(int);
 
   // Exceptions

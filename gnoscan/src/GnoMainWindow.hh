@@ -66,6 +66,7 @@ namespace gnomain {
     void displayAboutBox(void);
     void displayLicenseBox(void);
     void displayOptions(void);
+    void displayHelp(void);
     void destroyDialog(void);
     void closeWindow(void);
     void closeWindowAndSave(void);
@@ -80,6 +81,9 @@ namespace gnomain {
       return 0;
     }
   };
+
+  void* callHelp(void*);
+  class PThreadException { };
 
 }
 

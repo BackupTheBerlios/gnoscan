@@ -1,6 +1,11 @@
 GnoScan ChangeLog
 -=-=-=-=-=-=-=-=-
 
+Tue Feb 13 16:21:11 GMT+1 2001  Andreas Bauer  <baueran@users.berlios.de>
+
+  - Added help option in GnoMainWindow.cc and doc/ directory
+
+
 Mon Feb 12 17:05:16 GMT+1 2001  Andreas Bauer  <baueran@users.berlios.de>
 
   - Implemented max. number of time-outs and added it to the options dialog

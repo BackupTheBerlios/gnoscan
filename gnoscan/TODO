@@ -7,7 +7,8 @@ GnoScan TODO
 
 - Add netmask scanning (see feature above, otherwise it gets SLOW)
 
-- Fix up path for the icons of the "Scan" button, i.e. make it dynamic
+- Fix up path for the icons of the "Scan" button and the gnome-help-browser,
+  i.e. make it dynamic
 
 - Add man page and installation documents
 
