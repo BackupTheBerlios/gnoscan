@@ -66,6 +66,7 @@ namespace gnomain {
     void displayOptions(void);
     void destroyDialog(void);
     void closeWindow(void);
+    void closeWindowAndSave(void);
     void startScan(scanOptions);
 
   public:
@@ -73,7 +74,7 @@ namespace gnomain {
     ~GnoMainWindow();
     
     gint delete_event_impl(GdkEventAny*) {
-      Gtk::Main::quit();
+      closeWindowAndSave();
       return 0;
     }
   };

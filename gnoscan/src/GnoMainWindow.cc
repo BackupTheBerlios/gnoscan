@@ -41,6 +41,10 @@
 #include <gnome--/app.h>
 #include <gnome--/about.h>
 #include <gnome--/dialog.h>
+extern "C" {
+#include <unistd.h>
+#include <sys/types.h>
+}
 #include "config.h"
 #include "GnoMainWindow.hh"
 #include "PreferencesBox.hh"
@@ -80,7 +84,7 @@ namespace gnomain {
   void GnoMainWindow::init(void) {
     scanOptions options;
 
-    set_policy(false, true, false);
+    set_policy(FALSE, TRUE, FALSE);
     set_default_size(appWidth, appHeight);
 
     try {
@@ -107,10 +111,10 @@ namespace gnomain {
       Gtk::HBox* portButtonsHBox = manage(new Gtk::HBox(TRUE, 0));
       Gtk::Frame* portRangeFrame = manage(new Gtk::Frame("Port Range:"));
       Gtk::Label* portStartLabel = manage(new Gtk::Label("Start:"));
-      Gtk::Adjustment* spinbutton1_adj = manage(new Gtk::Adjustment(0, 0, 10000, 1, 10, 10));
+      Gtk::Adjustment* spinbutton1_adj = manage(new Gtk::Adjustment(0, 0, 65535, 1, 10, 10));
       Gtk::SpinButton* portStart = manage(new Gtk::SpinButton(*spinbutton1_adj, 1, 0));
       Gtk::Label* portEndLabel = manage(new Gtk::Label("End:"));
-      Gtk::Adjustment* spinbutton2_adj = manage(new Gtk::Adjustment(1023, 0, 10000, 1, 10, 10));
+      Gtk::Adjustment* spinbutton2_adj = manage(new Gtk::Adjustment(1023, 0, 65535, 1, 10, 10));
       Gtk::SpinButton* portEnd = manage(new Gtk::SpinButton(*spinbutton2_adj, 1, 0));
       portStart->set_numeric(TRUE);
       portEnd->set_numeric(TRUE);
@@ -216,7 +220,7 @@ namespace gnomain {
     menuEdit.push_back(Gnome::MenuItems::Properties(slot(this, &GnoMainWindow::displayOptions)));
     
     // File menu
-    menuFile.push_back(Gnome::MenuItems::Exit(slot(this, &GnoMainWindow::closeWindow)));
+    menuFile.push_back(Gnome::MenuItems::Exit(slot(this, &GnoMainWindow::closeWindowAndSave)));
     
     // Menu bar
     menuBar.push_back(Gnome::Menus::File(menuFile));
@@ -230,6 +234,7 @@ namespace gnomain {
   
   void GnoMainWindow::startScan(scanOptions ops) {
     string serverName = ops.server->get_text();
+    int sourcePort = 0;
 
     // Change GUI
     scanCList->rows().clear();
@@ -247,22 +252,29 @@ namespace gnomain {
       return;
     }
 
-    if ( (ops.start->get_value_as_int() < 0) || (ops.end->get_value_as_int() < 0) ) {
-      Gnome::Dialogs::error("Only positive port numbers are valid.");
+    if (prefs->sourcePortValue() < 1024 && getuid() && geteuid()) {
+      Gnome::Dialogs::error("Only root can bind to port number range 0 - 1023.\nCheck your preferences or restart the program as root.");
       return;
     }
-    
-    // Main scanning process
+
     try {
+      // Check whether we want to scan from a specific source port
+      if (prefs->useSpecificSourcePort())
+	sourcePort = prefs->sourcePortValue();
+      else
+	sourcePort = -1;
+
+      // This scans the host/network and returns the results
       const vector<scan::scanResult>* results = scannerObj.scan(ops.start->get_value_as_int(),   // Start port
 								ops.end->get_value_as_int(),     // End port
-								prefs->sourcePortValue(),        // Source port
+								sourcePort,                      // Source port
 							        prefs->extraInfoValue(),         // Extra info?
 								ops.server->get_text(),          // Host
 								"");                             // Netmask
+
       vector<scan::scanResult>::const_iterator curResult = results->begin();
       vector<string> listItems;
-      char openPort[32];  // Not nice but more than large enough...
+      char openPort[32];  // Not nice, but more than large enough...
       string openService;
 
       while (curResult != results->end()) {
@@ -297,6 +309,14 @@ namespace gnomain {
   }
   
   
+  void GnoMainWindow::closeWindowAndSave(void) {
+    if (!prefs->save(prefs->getFileName()))
+      cerr << (string)PACKAGE << ": Error: Could not store rcfile for preferences. Changes you made have not been stored to disk." << endl;
+
+    Gnome::Main::quit();
+  }
+
+
   void GnoMainWindow::displayAboutBox(void) {
     vector<string> authors;
     string copyright = "Copyright (c) 2001 Andreas Bauer";

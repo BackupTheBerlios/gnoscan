@@ -20,14 +20,23 @@
 #ifndef PREFERENCESBOX_HH
 #define PREFERENCESBOX_HH
 
+#include <gtk--/button.h>
 #include <gnome--.h>
 #include <gnome--/dialog.h>
 #include "Preferences.hh"
 
 class PreferencesBox : public Gnome::Dialog {
 private:
+  // Variables
   pref::Preferences* prefs;
+  Gtk::RadioButton* noPort;
+  Gtk::RadioButton* aPort;
+  Gtk::SpinButton* sourcePortSpin;
+  Gtk::CheckButton* extraButton;
+
+  // Functions
   void init(void);
+  void buttonClicked(int);
 
 public:
   PreferencesBox(pref::Preferences*);

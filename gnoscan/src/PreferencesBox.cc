@@ -36,7 +36,7 @@ PreferencesBox::~PreferencesBox() {
 
 PreferencesBox::PreferencesBox(pref::Preferences* newPrefs) {
   prefs = newPrefs;
-  set_policy(false, false, false);
+  set_policy(FALSE, FALSE, FALSE);
   set_title ("Options");
   set_border_width(0);
   set_usize(320, 200);
@@ -50,11 +50,14 @@ void PreferencesBox::init(void) {
   Gtk::HBox* aPortHBox = manage(new Gtk::HBox());
   Gtk::Frame* sourceFrame = manage(new Gtk::Frame("Source Port:"));
   Gtk::RadioButton_Helpers::Group gr;
-  Gtk::RadioButton* noPort = manage(new Gtk::RadioButton(gr, "No specific port (recommended, MUCH faster)", 0));
-  Gtk::RadioButton* aPort = manage(new Gtk::RadioButton(gr, "Use a specific port:", 0));
-  Gtk::Adjustment* spinbutton_adj = manage(new Gtk::Adjustment(0, 0, 10000, 1, 10, 10));
-  Gtk::SpinButton* sourcePortSpin = manage(new Gtk::SpinButton(*spinbutton_adj, 1, 0));
-  Gtk::CheckButton* extraButton = manage(new Gtk::CheckButton("Display extra information", 0.0, 0.5));
+  noPort = manage(new Gtk::RadioButton(gr, "No specific port (recommended, MUCH faster)"));
+  aPort = manage(new Gtk::RadioButton(gr, "Use a specific port:"));
+  noPort->set_active(!(prefs->useSpecificSourcePort()));
+  aPort->set_active(prefs->useSpecificSourcePort());
+  Gtk::Adjustment* spinbutton_adj = manage(new Gtk::Adjustment(prefs->sourcePortValue(), 0, 10000, 1, 10, 10));
+  sourcePortSpin = manage(new Gtk::SpinButton(*spinbutton_adj, 1, 0));
+  extraButton = manage(new Gtk::CheckButton("Display extra information", 0.0, 0.5));
+  extraButton->set_active(prefs->extraInfoValue());
   sourcePortSpin->set_usize(60, 22);
   sourcePortSpin->set_numeric(TRUE);
   aPortHBox->pack_start(*aPort, FALSE, FALSE, 0);
@@ -73,6 +76,17 @@ void PreferencesBox::init(void) {
   append_button("OK", GNOME_STOCK_BUTTON_OK);
   append_button("Cancel", GNOME_STOCK_BUTTON_CANCEL);
   set_default(0);
-  set_close(true);
+  set_close(TRUE);
+  clicked.connect(slot(this, &PreferencesBox::buttonClicked));
   show_all();
+}
+
+
+void PreferencesBox::buttonClicked(int button) {
+  // Check if OK button was clicked
+  if (button == 0) {
+    prefs->setUseSpecificSourcePort(aPort->get_active());
+    prefs->setSourcePortValue(sourcePortSpin->get_value_as_int());
+    prefs->setExtraInfoValue(extraButton->get_active());
+  }
 }

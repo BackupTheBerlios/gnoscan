@@ -28,22 +28,28 @@ namespace pref {
   class Preferences {
   private:
     // Variables
+    string fileName;      // Preferences file name and path
     bool extraInfo;
+    bool specificPort;
     int sourcePort;
     vector<string> prefsFileContent;
 
     // Functions
     list<string> getPrefValues(string);
-    bool save(string);
     void setPrefValue(vector<string>::iterator&, string);
 
   public:
     Preferences(string);
     ~Preferences();
-    bool oneSourcePort(void);
-    bool noSourcePort(void);
+    bool save(string);
+    bool create(string);
+    bool useSpecificSourcePort(void);
+    void setUseSpecificSourcePort(bool);  // Takes TRUE if specific source port should be used
     int sourcePortValue(void);
+    void setSourcePortValue(int);
     bool extraInfoValue(void);
+    void setExtraInfoValue(bool);
+    string getFileName(void);
   };
 
   // Exceptions

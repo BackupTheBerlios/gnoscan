@@ -31,12 +31,14 @@ using namespace std;
 namespace pref {
 
   Preferences::Preferences(string file) {
-    ifstream prefsFile(file.c_str());
+    fileName = file;
+    ifstream prefsFile(fileName.c_str());
     string curLine;
 
     // Defaults
-    sourcePort = -1;
+    sourcePort = 0;
     extraInfo = TRUE;
+    specificPort = FALSE;
 
     // Load settings
     if (prefsFile) {
@@ -47,7 +49,16 @@ namespace pref {
 	  
 	  if (curLine.find("SOURCE_PORT=", 0) == 0) {
 	    sourcePort = atoi( (*(getPrefValues(curLine)).begin()).c_str() );
-	    cout << "Source port: " << sourcePort << endl;
+	  }
+	  else if (curLine.find("SPECIFIC_PORT=", 0) == 0) {
+	    if (*(getPrefValues(curLine)).begin() == "yes")
+	      specificPort = TRUE;
+	    else if (*(getPrefValues(curLine)).begin() == "no")
+	      specificPort = FALSE;
+	    else {
+	      cerr << (string)PACKAGE << ": Error: Specific port could not be set in the rcfile." << endl;
+	      throw MalformedPrefsFile();      
+	    }
 	  }
 	  else if (curLine.find("EXTRA_INFO=", 0) == 0) {
 	    if (*(getPrefValues(curLine)).begin() == "yes")
@@ -55,11 +66,9 @@ namespace pref {
 	    else if (*(getPrefValues(curLine)).begin() == "no")
 	      extraInfo = FALSE;
 	    else {
-	      cerr << (string)PACKAGE << ": Error: Malformed rcfile for preferences. Program start aborted." << endl;
+	      cerr << (string)PACKAGE << ": Error: Extra info could not be set in the rcfile." << endl;
 	      throw MalformedPrefsFile();      
 	    }
-
-	    cout << "Extra Info: " << extraInfo << endl;
 	  }
 	  else {
 	    cerr << (string)PACKAGE << ": Error: Malformed rcfile for preferences. Program start aborted." << endl;
@@ -68,7 +77,6 @@ namespace pref {
 
 	  // Store prefs in memory, as long as there are not too many keywords this works ok
 	  prefsFileContent.push_back(curLine);
-	  cout << "Line read: " << curLine.c_str() << endl;
 	}
       }
       catch (...) {
@@ -79,7 +87,7 @@ namespace pref {
       prefsFile.close();
     }
     else {
-      if (!save(file))
+      if (!create(file))
 	cerr << (string)PACKAGE << ": Error: Could not locate or create rcfile for preferences. Check file permissions and paths." << endl;
     }
   }
@@ -136,6 +144,12 @@ namespace pref {
 	  else
 	    setPrefValue(curLine, "no");
 	}
+	else if ((*curLine).find("SPECIFIC_PORT=", 0) == 0) {
+	  if (specificPort)
+	    setPrefValue(curLine, "yes");
+	  else
+	    setPrefValue(curLine, "no");
+	}
 	
 	prefsFile << *curLine << std::endl;      // Append line to preferences file
 	curLine++;                               // Onwards with the next line...
@@ -149,6 +163,12 @@ namespace pref {
   }
 
 
+  bool Preferences::create(string file) {
+    cout << "Now I should create an rcfile, right?" << endl;
+    return TRUE;
+  }
+
+
   // Sets the new preferences value for a certain parameter
   void Preferences::setPrefValue(vector<string>::iterator& curLine, string newValue) {
     (*curLine).replace((*curLine).find('=') + 1, (*curLine).length(), newValue);
@@ -156,20 +176,14 @@ namespace pref {
 
   
   // Returns 'true' if one specific source port was chosen
-  bool Preferences::oneSourcePort(void) {
-    if (sourcePort != -1)
+  bool Preferences::useSpecificSourcePort(void) {
+    if (specificPort)
       return TRUE;
     else
       return FALSE;
   }
 
   
-  // Returns 'true' if no specific source port was chosen
-  bool Preferences::noSourcePort(void) {
-    return(!oneSourcePort());
-  }
-
-
   // Returns source port
   int Preferences::sourcePortValue(void) {
     return sourcePort;
@@ -178,6 +192,26 @@ namespace pref {
 
   bool Preferences::extraInfoValue(void) {
     return extraInfo;
+  }
+
+
+  void Preferences::setExtraInfoValue(bool newVal) {
+    extraInfo = newVal;
+  }
+
+
+  void Preferences::setUseSpecificSourcePort(bool newVal) {
+    specificPort = newVal;
+  }
+
+  
+  void Preferences::setSourcePortValue(int newVal) {
+    sourcePort = newVal;
+  }
+
+
+  string Preferences::getFileName(void) {
+    return fileName;
   }
 
 }
