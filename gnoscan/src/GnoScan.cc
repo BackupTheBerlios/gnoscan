@@ -22,6 +22,7 @@
 #include <iostream>
 #include <string>
 extern "C" {
+#include <stdlib.h>
 #include <glib.h>
 #include <gdk/gdk.h>
 #include <stdlib.h>
@@ -48,33 +49,34 @@ using namespace std;
 int main(int argc, char *argv[])
 {
   int c = 0, option_index = 0;
-  extern char *optarg;
-  string gnoscanrc, prefsFile;
+  extern char* optarg;
+  static string gnoscanrc, prefsFile;
 
   static struct option long_options[] = {
-    {"help", 0, NULL, VALUE_HELP},
     {"gnoscanrc", 1, NULL, VALUE_GNOSCANRC},
-    {"version", 0, NULL, VALUE_VERSION},
+    {"help",      0, NULL, VALUE_HELP},
+    {"version",   0, NULL, VALUE_VERSION},
     {0, 0, 0, 0}
   };
 
   // Scan command line parameters
-  while ( (c = getopt_long(argc, argv, "hV", long_options, &option_index)) != -1 ) {
+  while ( (c = getopt_long(argc, argv, "g:G:hV", long_options, &option_index)) != -1 ) {
     switch (c) {
     case 'h':
     case VALUE_HELP:
       cout << "Use GnoScan to scan and secure your network." << endl;
       cout << endl;
-      cout << "Usage: " << PACKAGE << " [HOSTNAME | NETWORK ADDRESS]... [OPTION]..." << endl;
+      cout << "Usage: " << PACKAGE << " [OPTION]..." << endl;
       cout << endl;
       cout << "Options:" << endl;
       cout << "  -h, --help               Display this help information" << endl;
       cout << "  -V, --version            Display version information" << endl;
-      cout << "      --gnoscanrc=FILE     Location of preferences and settings file" << endl;
+      cout << "  -G, --gnoscanrc=FILE     Location of preferences and settings file" << endl;
       cout << endl;
       cout << "Report bugs to <baueran@users.berlios.de>." << endl;
       return(0);
       break;
+    case 'G':
     case VALUE_GNOSCANRC:
       gnoscanrc = optarg;
       break;
@@ -92,6 +94,7 @@ int main(int argc, char *argv[])
       // Unrecognized option
       cerr << "Try '" << argv[0] << " --help' for more information." << endl;
       return(-1);
+      break;
     }
   }
 
@@ -120,7 +123,6 @@ int main(int argc, char *argv[])
     gdk_threads_enter();
     kit.run();
     gdk_threads_leave();
-
 
     // End program
     return(0);

@@ -93,6 +93,8 @@ namespace pref {
     else {
       if (!create(file))
 	cerr << (string)PACKAGE << ": Error: Could not locate or create rcfile for preferences. Check file permissions and paths." << endl;
+      else
+	cout << "At this point GnoScan should have created an rcfile automatically." << endl;
     }
   }
 
@@ -173,7 +175,7 @@ namespace pref {
 
 
   bool Preferences::create(string file) {
-    cout << "Now I should create an rcfile, right?" << endl;
+    cout << "Inside create() function with " << file.c_str() << " as parameter." << endl;
     return TRUE;
   }
 

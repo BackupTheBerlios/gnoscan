@@ -20,9 +20,9 @@
 #ifndef GNOSCAN_HH
 #define GNOSCAN_HH
 
-#define VALUE_HELP          0
-#define VALUE_VERSION       1
-#define VALUE_GNOSCANRC     2
+#define VALUE_GNOSCANRC     1
+#define VALUE_HELP          2
+#define VALUE_VERSION       3
 
 #ifndef FALSE
 #define FALSE           false

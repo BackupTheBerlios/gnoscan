@@ -1,0 +1,10 @@
+GnoScan BUGS
+-=-=-=-=-=-=
+
+This is a list of known bugs in GnoScan. You don't have to report the problems
+listed here, as I'm already working on them. However, I do appreciate any kind
+of feedback on GnoScan anyway.
+
+- The --gnoscanrc switch doesn't work properly
+
+- The netmask scanning does not work; the settings are ignored

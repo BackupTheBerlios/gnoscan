@@ -195,8 +195,8 @@ namespace gnomain {
       Gtk::Button* cancelButton = manage(new Gnome::StockButton(GNOME_STOCK_BUTTON_CANCEL));
       Gtk::Pixmap* scanPixmap = manage(new Gtk::Pixmap((string)DATADIR + "/pixmaps/gnoscan/tb_search.xpm"));
       Gtk::Label* scanLabel = manage(new Gtk::Label("Scan"));
-      scanButtonBox->pack_start(*manage(static_cast<Gtk::Widget*>(scanPixmap)));
-      scanButtonBox->pack_start(*scanLabel);
+      scanButtonBox->pack_start(*manage(static_cast<Gtk::Widget*>(scanPixmap)), TRUE, FALSE, 0);
+      scanButtonBox->pack_start(*scanLabel, TRUE, FALSE, 0);
       Gtk::Button* scanButton = manage(new Gtk::Button());
       scanButton->add(*scanButtonBox);
       confirmButtonBox->add(*scanButton);
