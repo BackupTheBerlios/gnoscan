@@ -54,7 +54,7 @@ AC_CHECK_FUNC(getopt_long,
 dnl gtkmm and gnomemm
 AM_PATH_GTK(1.2.7,, [AC_MSG_ERROR([*** GTK >= 1.2.7 required, but it does not seem to be installed]) ])
 
-AM_PATH_GTKMM(1.2.5, , [AC_MSG_ERROR([*** GTK-- >= 1.2.5 required, but it does not seem to be installed]) ])
+AM_PATH_GTKMM(1.2.7, , [AC_MSG_ERROR([*** GTK-- >= 1.2.7 required, but it does not seem to be installed]) ])
 AC_SUBST($GTKMM_CFLAGS)
 
 GNOME_INIT
