@@ -85,7 +85,7 @@ namespace gnomain {
       Gtk::HBox* serverHBox = manage(new Gtk::HBox());
       Gtk::Label* serverLabel = manage(new Gtk::Label("Host:"));
       Gtk::Entry* serverEntry = manage(new Gtk::Entry(40));
-      // serverEntry->set_text("192.168.1.2");
+      serverEntry->set_text("192.168.1.2");
       serverHBox->pack_start(*serverLabel, FALSE, FALSE, STD_PADDING);
       serverHBox->pack_start(*serverEntry, TRUE, TRUE, STD_PADDING);
       
@@ -230,10 +230,7 @@ namespace gnomain {
     statusBar->push(statusBar->get_context_id((string)PACKAGE), "Scanning...");
 
     try {
-      // cout << "Scanning " << serverName.c_str() << " " << ops.start->get_value_as_int() << "-" << ops.end->get_value_as_int() << endl;
-      const vector<scan::scanResult>* results = scannerObj.scan(ops.start->get_value_as_int(),
-								ops.end->get_value_as_int(),
-								ops.server->get_text());
+      const vector<scan::scanResult>* results = scannerObj.scan(ops.start->get_value_as_int(), ops.end->get_value_as_int(), ops.server->get_text());
       vector<scan::scanResult>::const_iterator curResult = results->begin();
       vector<string> listItems;
       char openPort[32];  // Not nice but more than large enough...
@@ -244,27 +241,18 @@ namespace gnomain {
 	snprintf(openPort, 6, "%d", curResult->port);
 	openService = curResult->service;
 
-	// Now store open ports and services and then display
+	// Now store all open ports, services, etc. and then display
 	listItems.push_back(curResult->host);
 	listItems.push_back(openPort);
 	listItems.push_back(openService);
 	listItems.push_back(curResult->info);
-
 	scanCList->rows().push_back(listItems);
 	curResult++;
-
-	cout << "  " << openPort << " " << openService.c_str() << endl;
 	listItems.clear();
       }
     }
     catch (scan::DnsError) {
       Gnome::Dialogs::error("DNS lookup error. Could not resolve domain name.");
-    }
-    catch (scan::ShutDownException) {
-      Gnome::Dialogs::error("Error occured when trying to shut-down open ports.");
-    }
-    catch (scan::CloseException) {
-      Gnome::Dialogs::error("Error occured when trying to close open ports.");
     }
     catch (...) {
       throw;

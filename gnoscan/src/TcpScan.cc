@@ -21,6 +21,7 @@
 #include <string>
 #include <vector>
 extern "C" {
+#include <errno.h>
 #include <sys/time.h>
 #include <sys/types.h>
 #include <stdlib.h>
@@ -32,6 +33,7 @@ extern "C" {
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <stdio.h>
+#include <string.h>
 }
 #include "config.h"
 #include "TcpScan.hh"
@@ -47,10 +49,10 @@ namespace scan {
   }
   
   
-  vector<scanResult>* TcpScan::scan(int start, int end, string server) {
+  vector<scanResult>* TcpScan::scan(const int start, const int end, const string server) {
     timeval timeOut;
     fd_set readSockets;
-    int mySocket = 0;
+    int mySocket = 0, z = 0;
     servent *portname = NULL;
     scanResult result;
     sockaddr_in dest;
@@ -67,9 +69,9 @@ namespace scan {
       timeOut.tv_sec = 2;
       timeOut.tv_usec = 0;
       
-      if ( (mySocket = socket(PF_INET, SOCK_STREAM, 0)) == -1) {
+      if ( (mySocket = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
 	cerr << (string)PACKAGE << ": Socket for port " << i << " failed to open." << endl;
-	close(mySocket);
+	cerr << (string)PACKAGE << ": Error number " << errno << " occured: " << strerror(errno) << "." << endl;
 	break;
       }
       else
@@ -82,16 +84,16 @@ namespace scan {
 	  // Set communication parameters
 	  memset((char*)&dest, 0, sizeof(sockaddr_in));
 	  dest.sin_port = htons(i);
-	  dest.sin_family = PF_INET;
+	  dest.sin_family = AF_INET;
 	  memcpy(&(dest.sin_addr.s_addr), myHost->h_addr, myHost->h_length);
 	  
 	  // Try to open the port
 	  if (connect(mySocket, (const sockaddr*)&dest, sizeof(dest)) == 0) {
-	    FD_SET(mySocket, &readSockets);                                         // Put current socket into the list
-	    int z = select (mySocket + 1, &readSockets, NULL, NULL, &timeOut);      // Wait for timeout
+	    FD_SET(mySocket, &readSockets);                                     // Put current socket into the list
+	    z = select(mySocket + 1, &readSockets, NULL, NULL, &timeOut);       // Wait for timeout
 
 	    if (z > 0) {
-	      z = read(mySocket, &myBuffer, sizeof myBuffer - 1);
+	      z = read(mySocket, &myBuffer, sizeof(myBuffer) - 5);
 	      
 	      if (z > 0) {
 		myBuffer[z] = 0;
@@ -102,8 +104,10 @@ namespace scan {
 	    }
 	    else
 	      extraInfo = "not specified";
-
+	    
 	    FD_ZERO(&readSockets);
+
+	    // Store the results
 	    portname = getservbyport(htons(i), "tcp");
 	    
 	    if (portname) {
@@ -115,21 +119,22 @@ namespace scan {
 	    }
 	    else {
 	      result.host = server;
-	      result.service = "unspecified";
+	      result.service = "unknown";
 	      result.port = i;
 	      result.info = extraInfo;
 	    }
 
 	    results.push_back(result);
-
-	    // Close connection
-	    if (close(mySocket) == -1)
-	      throw CloseException();
-
-	    // Clean-up
-	    portname = NULL;
-	    myHost = NULL;
 	  }
+
+	  // Close connection, regardless of errors
+	  shutdown(mySocket, 2);
+	  close(mySocket);
+
+	  // Clean-up
+	  portname = NULL;
+	  myHost = NULL;
+	  mySocket = 0;
 	}
 	catch (...) {
 	  throw;

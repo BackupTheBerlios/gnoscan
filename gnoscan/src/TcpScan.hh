@@ -46,13 +46,11 @@ namespace scan {
     TcpScan();
     ~TcpScan();
   
-    vector<scanResult>* scan(int, int, string);
+    vector<scanResult>* scan(const int, const int, const string);
   };
 
   // Exceptions
   class DnsError { };
-  class ShutDownException { };
-  class CloseException { };
 }
 
 #endif
