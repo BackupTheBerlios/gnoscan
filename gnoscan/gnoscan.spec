@@ -2,7 +2,7 @@
 # -*- rpm-spec -*-
 
 %define name GnoScan 
-%define version 0.1
+%define version 0.1.1
 %define release 1
 
 Name:           %{name}
@@ -16,9 +16,13 @@ Buildroot:      %{_tmppath}/%{name}-%{version}-%{release}-root
 URL:            http://gnoscan.berlios.de/
 Packager:       Andreas Bauer <baueran@users.berlios.de>
 
-Requires:       gnomemm
+Requires:       gnome-libs >= 1.2.0
+Requires:       gtk+ >= 1.2.7
+Requires:       libsigc++ >= 1.0.0
+Requires:       gtkmm >= 1.2.4
+Requires:       gnomemm >= 1.1.12
 
-%description
+%description    
 GnoScan is a multi-threaded network scan and security utility with an
 intuitive graphical user interface. It runs under the Gnome environment and
 is an independent application that does not depend on third-party toolkits.
@@ -27,7 +31,7 @@ is an independent application that does not depend on third-party toolkits.
 %setup
 
 %build
-./configure --prefix=%{_prefix}
+./configure --prefix=%{_prefix} --sysconfdir=%{_sysconfdir}
 make
 
 %install

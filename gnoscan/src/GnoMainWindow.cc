@@ -66,6 +66,7 @@ namespace gnomain {
   pthread_mutex_t scanLock = PTHREAD_MUTEX_INITIALIZER;
   vector<scan::scanResult>* results;
   Gtk::CList* scanCList;
+  Gtk::Button* scanButton;
   Gtk::Statusbar* statusBar;
   unsigned int statusBarID;
   scan::TcpScan scannerObj;
@@ -197,7 +198,7 @@ namespace gnomain {
       Gtk::Label* scanLabel = manage(new Gtk::Label("Scan"));
       scanButtonBox->pack_start(*manage(static_cast<Gtk::Widget*>(scanPixmap)), TRUE, FALSE, 0);
       scanButtonBox->pack_start(*scanLabel, TRUE, FALSE, 0);
-      Gtk::Button* scanButton = manage(new Gtk::Button());
+      scanButton = manage(new Gtk::Button());
       scanButton->add(*scanButtonBox);
       confirmButtonBox->add(*scanButton);
       confirmButtonBox->add(*cancelButton);
@@ -312,7 +313,9 @@ namespace gnomain {
 	   (pthread_create(&resultThread, NULL, scanResultProcess, &results) != 0) ) {
 	throw PThreadException();
       }
-      
+      else
+	scanButton->set_sensitive(FALSE);
+
       if (pthread_mutex_unlock(&scanLock) != 0) {
 	throw PThreadException();
       }
@@ -502,6 +505,7 @@ namespace gnomain {
     // Change GUI
     statusBar->pop(statusBarID);
     statusBar->push(statusBarID, "Ready");
+    scanButton->set_sensitive(TRUE);
 
     // Release GTK mutex
     gdk_threads_leave();

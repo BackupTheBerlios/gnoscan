@@ -1,28 +1,35 @@
 GnoScan ChangeLog
 -=-=-=-=-=-=-=-=-
 
+Thu Feb 22 11:41:52 GMT+1 2001  Andreas Bauer  <baueran@users.berlios.de>
+
+  - Disabled the possibility of starting more than one scan process
+
+  - Added more detailed descriptions of requirements for GnoScan
+
+
 Tue Feb 20 17:16:33 GMT+1 2001  Andreas Bauer  <baueran@users.berlios.de>
 
- - Fixed up problems with wrong doc/ and pixmap/ paths affecting mostly
-   the RPM versions though
+  - Fixed up problems with wrong doc/ and pixmap/ paths affecting mostly
+    the RPM versions though
 
 
 Sun Feb 18 12:28:14 GMT+1 2001  Andreas Bauer  <baueran@users.berlios.de>
 
- - Fixed --gnoscanrc switch so the creation of rcfiles can be implemented now
+  - Fixed --gnoscanrc switch so the creation of rcfiles can be implemented now
 
- - Added automatic creation of new rcfiles
+  - Added automatic creation of new rcfiles
 
- - Added scanning of entire subnets by defining a netmask
+  - Added scanning of entire subnets by defining a netmask
 
 
 Thu Feb 15 12:00:21 GMT+1 2001  Andreas Bauer  <baueran@users.berlios.de>
 
- - Added multi-threaded port scan
+  - Added multi-threaded port scan
 
- - Added gthread support to configure.in
+  - Added gthread support to configure.in
 
- - Added more dynamic paths to help file and scan button pixmap
+  - Added more dynamic paths to help file and scan button pixmap
 
 
 Tue Feb 13 16:21:11 GMT+1 2001  Andreas Bauer  <baueran@users.berlios.de>

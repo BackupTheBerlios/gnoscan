@@ -1,6 +1,8 @@
 GnoScan TODO
 -=-=-=-=-=-=
 
+- Fix up the broken dependencies for RPM installation
+
 - Check for pthreads in configure.in
 
 - Add simple man page and installation documents

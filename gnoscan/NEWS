@@ -3,6 +3,9 @@ GnoScan NEWS
 
 GnoScan 0.1.1 - Development Version (still in development)
 
+  - Disabled possibility of starting more than one search thread and mess
+    things up that way
+
   - Fixed up paths for pixmaps/ and doc/, so help files and graphics show up
     properly
 
