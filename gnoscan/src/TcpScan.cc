@@ -49,7 +49,7 @@ namespace scan {
   
   vector<scanResult>* TcpScan::scan(int start, int end, string server) {
     timeval timeOut;
-    fd_set readSockets;           // set of sockets to look for data on
+    fd_set readSockets;
     int mySocket = 0;
     servent *portname = NULL;
     scanResult result;
@@ -58,8 +58,8 @@ namespace scan {
     hostent *myHost = NULL;
     char myBuffer[512];
 
+    // Clear previous results
     results.clear();
-    cout << "Scanning " << server << " in range " << start << " - " << end << endl;
 
     // Scan ports in range
     for (int i = start; i <= end; i++) {
@@ -68,7 +68,7 @@ namespace scan {
       timeOut.tv_usec = 0;
       
       if ( (mySocket = socket(PF_INET, SOCK_STREAM, 0)) == -1) {
-	cout << "Socket for port " << i << " failed to open." << endl;
+	cerr << (string)PACKAGE << ": Socket for port " << i << " failed to open." << endl;
 	close(mySocket);
 	break;
       }
@@ -87,8 +87,6 @@ namespace scan {
 	  
 	  // Try to open the port
 	  if (connect(mySocket, (const sockaddr*)&dest, sizeof(dest)) == 0) {
-	    cout << "Found an open port on " << inet_ntoa(dest.sin_addr) << ": " << i << " ";
-	    
 	    FD_SET(mySocket, &readSockets);                                         // Put current socket into the list
 	    int z = select (mySocket + 1, &readSockets, NULL, NULL, &timeOut);      // Wait for timeout
 
@@ -138,9 +136,7 @@ namespace scan {
 	}
       }
     }
-    
-    cout << "Returning to GnoMainWindow.cc again" << endl;
-    cout << "Vector size: " << results.size() << endl;
+
     return &results;
   }
 

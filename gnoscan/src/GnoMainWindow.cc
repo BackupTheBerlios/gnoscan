@@ -83,9 +83,9 @@ namespace gnomain {
     try {
       // Server entry-box and label
       Gtk::HBox* serverHBox = manage(new Gtk::HBox());
-      Gtk::Label* serverLabel = manage(new Gtk::Label("Server:"));
+      Gtk::Label* serverLabel = manage(new Gtk::Label("Host:"));
       Gtk::Entry* serverEntry = manage(new Gtk::Entry(40));
-      serverEntry->set_text("192.168.1.2");
+      // serverEntry->set_text("192.168.1.2");
       serverHBox->pack_start(*serverLabel, FALSE, FALSE, STD_PADDING);
       serverHBox->pack_start(*serverEntry, TRUE, TRUE, STD_PADDING);
       
@@ -117,16 +117,16 @@ namespace gnomain {
       Gtk::Frame* scanFrame = manage(new Gtk::Frame("Results:"));
       scanCList = new Gtk::CList(4);
       scanCList->set_column_title(0, "Host");
-      scanCList->set_column_justification(0, GTK_JUSTIFY_CENTER);
+      scanCList->set_column_justification(0, GTK_JUSTIFY_LEFT);
       scanCList->set_column_width(0, 80);
       scanCList->set_column_title(1, "Port");
-      scanCList->set_column_justification(1, GTK_JUSTIFY_CENTER);
+      scanCList->set_column_justification(1, GTK_JUSTIFY_LEFT);
       scanCList->set_column_width(1, 40);
       scanCList->set_column_title(2, "Service");
-      scanCList->set_column_justification(2, GTK_JUSTIFY_CENTER);
+      scanCList->set_column_justification(2, GTK_JUSTIFY_LEFT);
       scanCList->set_column_width(2, 80);
-      scanCList->set_column_title(3, "Info");
-      scanCList->set_column_justification(3, GTK_JUSTIFY_CENTER);
+      scanCList->set_column_title(3, "Extra Info");
+      scanCList->set_column_justification(3, GTK_JUSTIFY_LEFT);
       scanCList->set_column_width(3, 120);
       scanCList->set_usize(-1, 150);
       scanCList->column_titles_show();
@@ -220,7 +220,7 @@ namespace gnomain {
     }
     
     if (ops.start->get_value_as_int() > ops.end->get_value_as_int()) {
-      Gnome::Dialogs::error("Start port must be at equal or greater than end port.");
+      Gnome::Dialogs::error("Start port must be equal or greater than end port.");
       return;
     }
 
@@ -234,7 +234,6 @@ namespace gnomain {
       const vector<scan::scanResult>* results = scannerObj.scan(ops.start->get_value_as_int(),
 								ops.end->get_value_as_int(),
 								ops.server->get_text());
-      // cout << "...Finished" << endl;
       vector<scan::scanResult>::const_iterator curResult = results->begin();
       vector<string> listItems;
       char openPort[32];  // Not nice but more than large enough...
