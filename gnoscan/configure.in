@@ -81,6 +81,7 @@ dnl Round up the configuration by defining libs
 LIBS="$LIBS `gtkmm-config --libs gthread`"
 
 AC_OUTPUT([Makefile
+           gnoscan.spec
 	       macros/Makefile
 	       pixmaps/Makefile
            doc/Makefile
