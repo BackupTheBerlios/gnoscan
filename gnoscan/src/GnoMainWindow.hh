@@ -68,7 +68,7 @@ namespace gnomain {
     void displayOptions(void);
     void closeWindow(void);
     void startScan(scanOptions);
-    
+
   public:
     GnoMainWindow(string);
     ~GnoMainWindow();

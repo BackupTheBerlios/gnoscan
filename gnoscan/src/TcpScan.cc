@@ -72,6 +72,7 @@ namespace scan {
       if ( (mySocket = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
 	cerr << (string)PACKAGE << ": Socket for port " << i << " failed to open." << endl;
 	cerr << (string)PACKAGE << ": Error number " << errno << " occured: " << strerror(errno) << "." << endl;
+	throw SocketFailed();
 	break;
       }
       else

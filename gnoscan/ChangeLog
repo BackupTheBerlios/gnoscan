@@ -1,11 +1,19 @@
 GnoScan ChangeLog
 -=-=-=-=-=-=-=-=-
 
+Tue Feb  6 18:43:18 GMT+1 2001  Andreas Bauer  <baueran@users.berlios.de>
+
+  - Fixed a very nasty bug in which open sockets did not get closed after
+    scanning
+
+  - Added extra information to scanner output
+
+
 Sat Feb  3 14:49:28 GMT+1 2001  Andreas Bauer  <baueran@users.berlios.de>
 
-- Added user interface and TcpScan class files
+  - Added user interface and TcpScan class files
 
 
 Thu Feb  1 17:04:52 GMT+1 2001  Andreas Bauer  <baueran@users.berlios.de>
 
-- Initial creation of source files and autoconf/automake configuration
+  - Initial creation of source files and autoconf/automake configuration

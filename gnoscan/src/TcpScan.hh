@@ -51,6 +51,7 @@ namespace scan {
 
   // Exceptions
   class DnsError { };
+  class SocketFailed { };
 }
 
 #endif

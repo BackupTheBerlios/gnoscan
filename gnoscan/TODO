@@ -1,0 +1,10 @@
+GnoScan TODO
+-=-=-=-=-=-=
+
+- Domain names are not yet resolved properly - why?!
+
+- Add facility to scan entire subnets
+
+- Add specific source port for scans
+
+- Add Posix Threads for scanning to release the pressed "Scan" button

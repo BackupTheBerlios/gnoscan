@@ -213,6 +213,11 @@ namespace gnomain {
   void GnoMainWindow::startScan(scanOptions ops) {
     string serverName = ops.server->get_text();
 
+    // Change GUI
+    scanCList->rows().clear();
+    statusBar->pop(statusBar->get_context_id((string)PACKAGE));
+    statusBar->push(statusBar->get_context_id((string)PACKAGE), "Scanning...");
+
     // Check if server was specified, etc.
     if (!serverName.length()) {
       Gnome::Dialogs::error("Please specifiy the server first.");
@@ -224,11 +229,7 @@ namespace gnomain {
       return;
     }
 
-    // Now begin the scanning process...
-    scanCList->rows().clear();
-    statusBar->pop(statusBar->get_context_id((string)PACKAGE));
-    statusBar->push(statusBar->get_context_id((string)PACKAGE), "Scanning...");
-
+    // Main scanning process
     try {
       const vector<scan::scanResult>* results = scannerObj.scan(ops.start->get_value_as_int(), ops.end->get_value_as_int(), ops.server->get_text());
       vector<scan::scanResult>::const_iterator curResult = results->begin();
@@ -254,13 +255,12 @@ namespace gnomain {
     catch (scan::DnsError) {
       Gnome::Dialogs::error("DNS lookup error. Could not resolve domain name.");
     }
+    catch (scan::SocketFailed) {
+      Gnome::Dialogs::error("Could not create socket for host communication.");
+    }
     catch (...) {
       throw;
     }
-
-    // Reset status bar
-    statusBar->pop(statusBar->get_context_id((string)PACKAGE));
-    statusBar->push(statusBar->get_context_id((string)PACKAGE), "Ready");
   }
 
   
