@@ -1,6 +1,12 @@
 GnoScan ChangeLog
 -=-=-=-=-=-=-=-=-
 
+Tue Feb 20 17:16:33 GMT+1 2001  Andreas Bauer  <baueran@users.berlios.de>
+
+ - Fixed up problems with wrong doc/ and pixmap/ paths affecting mostly
+   the RPM versions though
+
+
 Sun Feb 18 12:28:14 GMT+1 2001  Andreas Bauer  <baueran@users.berlios.de>
 
  - Fixed --gnoscanrc switch so the creation of rcfiles can be implemented now

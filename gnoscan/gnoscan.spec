@@ -40,7 +40,7 @@ rm -rf $RPM_BUILD_ROOT
 %files
 %defattr(-, root, root)
 %doc AUTHORS COPYING ChangeLog INSTALL NEWS README TODO
-%{_prefix}/doc/index.html
+%{_prefix}/doc/gnoscan/index.html
 %{_datadir}/pixmaps/gnoscan/tb_search.xpm
 %{_bindir}/gnoscan
 
