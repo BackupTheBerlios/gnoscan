@@ -1,0 +1,11 @@
+GnoScan ChangeLog
+-=-=-=-=-=-=-=-=-
+
+Sat Feb  3 14:49:28 GMT+1 2001  Andreas Bauer  <baueran@users.berlios.de>
+
+- Added user interface and TcpScan class files
+
+
+Thu Feb  1 17:04:52 GMT+1 2001  Andreas Bauer  <baueran@users.berlios.de>
+
+- Initial creation of source files and autoconf/automake configuration

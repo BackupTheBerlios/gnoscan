@@ -1,0 +1,25 @@
+GnoScan INSTALL
+-=-=-=-=-=-=-=-
+
+0. REQUIREMENTS
+
+1. BEFORE YOU START
+
+You must have the gtk/gtkmm macros properly installed. If your GTK--
+installation is in /usr/local then you should become user `root' now and follow
+these steps:
+
+  cd /usr/share/aclocal
+  cp /usr/local/share/aclocal/*.m4 .
+
+(Alternatively you can also place symbolic links between these files.) That
+makes sure the definitions needed for autoconf are in the right place. If your
+gtk/gtkmm stuff is installed in /usr then the above step should not be
+necessary. If you're not sure what to do, just run the configure script and
+wait for the complaints...
+
+2. CONFIGURATION
+
+3. COMPILATION
+
+4. INVOKING GNOSCAN

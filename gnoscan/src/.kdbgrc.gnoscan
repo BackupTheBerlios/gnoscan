@@ -1,0 +1,10 @@
+# KDE Config File
+[Breakpoint 0]
+Enabled=true
+Temporary=false
+File=TcpScan.cc
+Line=89
+[General]
+WorkingDirectory=
+FileVersion=1
+ProgramArgs=
