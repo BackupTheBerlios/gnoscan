@@ -26,6 +26,9 @@
 #define STD_PADDING         10
 #define STD_PADDING_HALF     5
 
+#define DNS_EXCEPTION        1
+#define SOCKET_FAILED        2
+
 #include <vector>
 #include <gnome--.h>
 #include <gnome--/app.h>

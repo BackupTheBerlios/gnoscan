@@ -301,30 +301,19 @@ namespace gnomain {
     allOps.extraInfo = prefs->extraInfoValue();
     allOps.timeOuts = prefs->maxTimeOuts();
 
-    try {
-      if (pthread_mutex_lock(&scanLock) != 0) {
+    if (pthread_mutex_lock(&scanLock) != 0) {
+      throw PThreadException();
+    }
+    else {
+      // Create two threads, one scanning and one waiting for the results to put them in the main dialog
+      if ( (pthread_create(&scanThread, NULL, scanProcess, &allOps) != 0) || 
+	   (pthread_create(&resultThread, NULL, scanResultProcess, &results) != 0) ) {
 	throw PThreadException();
       }
-      else {
-	// Create two threads, one scanning and one waiting for the results to put them in the main dialog
-	if ( (pthread_create(&scanThread, NULL, scanProcess, &allOps) != 0) || 
-	     (pthread_create(&resultThread, NULL, scanResultProcess, &results) != 0) ) {
-	  throw PThreadException();
-	}
-
-	if (pthread_mutex_unlock(&scanLock) != 0) {
-	  throw PThreadException();
-	}
+      
+      if (pthread_mutex_unlock(&scanLock) != 0) {
+	throw PThreadException();
       }
-    }
-    catch (scan::DnsError) {
-      Gnome::Dialogs::error("DNS lookup error. Could not resolve host name.");
-    }
-    catch (scan::SocketFailed) {
-      Gnome::Dialogs::error("Networking error. Could not create socket.");
-    }
-    catch (...) {
-      throw;
     }
   }
   
@@ -422,14 +411,25 @@ namespace gnomain {
     if (((optionsSummary*)newOps)->useSourcePort)
       sourcePort = ((optionsSummary*)newOps)->sourcePort;
 
-    results = scannerObj.scan(((optionsSummary*)newOps)->start,           // Start port
-			      ((optionsSummary*)newOps)->end,             // End port
-			      sourcePort,                                 // Source port, -1 if none was specified
-			      ((optionsSummary*)newOps)->extraInfo,       // Extra info?
-			      ((optionsSummary*)newOps)->server,          // Host
-			      ((optionsSummary*)newOps)->netmask,         // Netmask
-			      ((optionsSummary*)newOps)->timeOuts);       // Max time-outs
-    
+    try {
+      results = scannerObj.scan(((optionsSummary*)newOps)->start,           // Start port
+				((optionsSummary*)newOps)->end,             // End port
+				sourcePort,                                 // Source port, -1 if none was specified
+				((optionsSummary*)newOps)->extraInfo,       // Extra info?
+				((optionsSummary*)newOps)->server,          // Host
+				((optionsSummary*)newOps)->netmask,         // Netmask
+				((optionsSummary*)newOps)->timeOuts);       // Max time-outs
+    }
+    catch (scan::DnsError) {
+      return((void*)DNS_EXCEPTION);
+    }
+    catch (scan::SocketFailed) {
+      return((void*)SOCKET_FAILED);
+    }
+    catch (...) {
+      return((void*)-1);
+    }
+
     return(void*)0;
   }
 
@@ -437,9 +437,33 @@ namespace gnomain {
   void* scanResultProcess(void*) {
     void* thread_result;
 
+    // See if scanning process finished normally and if errors occured
     if (pthread_join(scanThread, &thread_result) != 0)
-      return((void*)-1);
+      return(thread_result);                // If we reach this point then it means the scan process fucked up
+    else {
+      if ((int*)thread_result == (int*)DNS_EXCEPTION) {
+	gdk_threads_enter();
+	Gnome::Dialogs::error("DNS lookup error. Could not resolve host name.");
+	// Change GUI
+	statusBar->pop(statusBarID);
+	statusBar->push(statusBarID, "Ready");
+	gdk_threads_leave();
+	return thread_result;
+      }
+      else if ((int*)thread_result == (int*)SOCKET_FAILED) {
+	gdk_threads_enter();
+	Gnome::Dialogs::error("Networking error. Could not create socket.");
+	// Change GUI
+	statusBar->pop(statusBarID);
+	statusBar->push(statusBarID, "Ready");
+	gdk_threads_leave();
+	return thread_result;
+      }
+    }
 
+    //
+    // If no errors occured, then go on processing the results:
+    //
     // Lock GTK mutex
     gdk_threads_enter();
 
