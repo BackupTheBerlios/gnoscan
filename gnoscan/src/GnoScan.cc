@@ -48,8 +48,9 @@ using namespace std;
 
 int main(int argc, char *argv[])
 {
-  int c = 0, option_index = 0;
+  int c = 0;
   extern char* optarg;
+  char* dummyArg[] = { "" };
   static string gnoscanrc, prefsFile;
 
   static struct option long_options[] = {
@@ -60,7 +61,7 @@ int main(int argc, char *argv[])
   };
 
   // Scan command line parameters
-  while ( (c = getopt_long(argc, argv, "g:G:hV", long_options, &option_index)) != -1 ) {
+  while ( (c = getopt_long(argc, argv, "G:hV", long_options, NULL)) != -1 ) {
     switch (c) {
     case 'h':
     case VALUE_HELP:
@@ -116,7 +117,7 @@ int main(int argc, char *argv[])
     pref::Preferences prefs(prefsFile);
 
     // Initialise the GnoScan kit
-    Gnome::Main kit((string)PACKAGE, (string)VERSION, argc, argv);
+    Gnome::Main kit((string)PACKAGE, (string)VERSION, 1, dummyArg);
 
     // Initialise main window and start message loop
     gnomain::GnoMainWindow mainWindow((string)PACKAGE, &prefs);
