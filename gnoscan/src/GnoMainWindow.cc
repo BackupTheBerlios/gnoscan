@@ -189,9 +189,6 @@ namespace gnomain {
       scanButton->clicked.connect(bind(slot(this, &GnoMainWindow::startScan), options));
       cancelButton->clicked.connect(slot(this, &GnoMainWindow::closeWindow));
       scanButton->grab_default();
-      
-      // Connect destroy handler
-      destroy.connect(slot(this, &GnoMainWindow::closeWindow));
     }
     catch (...) {
       throw;

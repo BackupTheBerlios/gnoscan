@@ -1,6 +1,10 @@
 GnoScan ChangeLog
 -=-=-=-=-=-=-=-=-
 
+Sat Feb 10 14:17:15 GMT+1 2001  Andreas Bauer  <baueran@users.berlios.de>
+
+  - Found and fixed the annoying bug that caused a Gtk error on exit
+
 
 Fri Feb  9 21:30:50 GMT+1 2001  Andreas Bauer  <baueran@users.berlios.de>
 
