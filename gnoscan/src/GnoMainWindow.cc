@@ -61,7 +61,7 @@ using SigC::bind;
 namespace gnomain {
 
   // Global variables, necessary due to C-style posix threads
-  string helpPath = (string)"/usr/bin/gnome-help-browser " + (string)PREFIX + (string)"/doc/gnoscan/index.html";
+  string helpPath = (string)"gnome-help-browser " + (string)PREFIX + (string)"/doc/gnoscan/index.html";
   pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
   pthread_mutex_t scanLock = PTHREAD_MUTEX_INITIALIZER;
   vector<scan::scanResult>* results;
