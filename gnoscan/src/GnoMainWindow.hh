@@ -21,7 +21,7 @@
 #define GNOMAINWINDOW_HH
 
 #define appWidth           400
-#define appHeight          300
+#define appHeight          465
 
 #define STD_PADDING         10
 #define STD_PADDING_HALF     5
@@ -54,17 +54,15 @@ namespace gnomain {
     vector<Gnome::UI::Info> menuEdit;
     vector<Gnome::UI::Info> menuHelp;
     Gtk::Statusbar* statusBar;
-    LicenseBox* licenseBox;
     Gtk::CList* scanCList;
     scan::TcpScan scannerObj;
 
     void init(void);
     void installMenus(void);
     void displayAboutBox(void);
-    void destroyAboutBox(void);
     void displayLicenseBox(void);
-    void destroyLicenseBox(void);
     void displayOptions(void);
+    void destroyDialog(void);
     void closeWindow(void);
     void startScan(scanOptions);
 

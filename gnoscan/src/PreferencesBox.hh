@@ -1,4 +1,4 @@
-// TcpScan.hh - source file for the GnoScan program
+// PreferencesBox.hh - source file for the GnoScan program
 // Copyright (c) 2001  Andreas Bauer <baueran@users.berlios.de>
 //
 // This program is free software; you can redistribute it and/or modify
@@ -16,42 +16,20 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
 // USA.
 
-#ifndef TCPSCAN_HH
-#define TCPSCAN_HH
 
-#include <string>
-#include <vector>
-extern "C" {
-#include <stdlib.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <netdb.h>
-#include <sys/socket.h>
-}
+#ifndef PREFERENCESBOX_HH
+#define PREFERENCESBOX_HH
 
-namespace scan {
+#include <gnome--.h>
+#include <gnome--/dialog.h>
 
-  struct scanResult {
-    string host;
-    int port;
-    string service;
-    string info;
-  };
+class PreferencesBox : public Gnome::Dialog {
+private:
+  void init(void);
 
-  class TcpScan {
-  private:
-    vector<scanResult> results;
-
-  public:
-    TcpScan();
-    ~TcpScan();
-  
-    vector<scanResult>* scan(const int, const int, const int, const bool, const string, const string);
-  };
-
-  // Exceptions
-  class DnsError { };
-  class SocketFailed { };
-}
+public:
+  PreferencesBox();
+  ~PreferencesBox();
+};
 
 #endif

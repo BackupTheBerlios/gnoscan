@@ -49,13 +49,13 @@ namespace scan {
   }
   
   
-  vector<scanResult>* TcpScan::scan(const int start, const int end, const string server) {
+  vector<scanResult>* TcpScan::scan(const int start, const int end, const int sourcePort, const bool info, const string server, const string netmask) {
     timeval timeOut;
     fd_set readSockets;
     int mySocket = 0, z = 0;
     servent *portname = NULL;
     scanResult result;
-    sockaddr_in dest;
+    sockaddr_in dest, source;
     string openService, extraInfo;
     hostent *myHost = NULL;
     char myBuffer[512];
@@ -87,26 +87,45 @@ namespace scan {
 	  dest.sin_port = htons(i);
 	  dest.sin_family = AF_INET;
 	  memcpy(&(dest.sin_addr.s_addr), myHost->h_addr, myHost->h_length);
+	  memset((char*)&source, 0, sizeof(sockaddr_in));
+	  source.sin_port = htons(0);
+	  source.sin_family = AF_INET;
+	  source.sin_addr.s_addr = htonl(INADDR_ANY);
 	  
+	  // Specifiy source port if given
+	  if (sourcePort != -1) {
+	    source.sin_port = htons(sourcePort);
+
+	    do {
+	      z = bind(mySocket, (const sockaddr*)&source, sizeof(source));
+	    } while(z);
+	  }
+
 	  // Try to open the port
 	  if (connect(mySocket, (const sockaddr*)&dest, sizeof(dest)) == 0) {
-	    FD_SET(mySocket, &readSockets);                                     // Put current socket into the list
-	    z = select(mySocket + 1, &readSockets, NULL, NULL, &timeOut);       // Wait for timeout
 
-	    if (z > 0) {
-	      z = read(mySocket, &myBuffer, sizeof(myBuffer) - 5);
+	    // Try to get additional information on the open port
+	    if (info) {
+	      FD_SET(mySocket, &readSockets);
+	      z = select(mySocket + 1, &readSockets, NULL, NULL, &timeOut);
 	      
 	      if (z > 0) {
-		myBuffer[z] = 0;
-		extraInfo = myBuffer;
+		z = read(mySocket, &myBuffer, sizeof(myBuffer) - 5);
+		
+		if (z > 0) {
+		  myBuffer[z] = 0;
+		  extraInfo = myBuffer;
+		}
+		else
+		  extraInfo = "not specified";
 	      }
 	      else
 		extraInfo = "not specified";
+	      
+	      FD_ZERO(&readSockets);
 	    }
 	    else
-	      extraInfo = "not specified";
-	    
-	    FD_ZERO(&readSockets);
+	      extraInfo = "";
 
 	    // Store the results
 	    portname = getservbyport(htons(i), "tcp");
@@ -128,7 +147,8 @@ namespace scan {
 	    results.push_back(result);
 	  }
 
-	  // Close connection, regardless of errors
+	  // Close connection, regardless of errors,
+	  // cause most sockets are created without actually getting connected to ports on the host
 	  shutdown(mySocket, 2);
 	  close(mySocket);
 

@@ -27,5 +27,7 @@ gnoscan_LDADD = $(GNOMEMM_LIBS)
 
 # Don't forget to update NEWS and ChangeLog
 gnoscan_SOURCES = 	GnoScan.cc GnoMainWindow.cc TcpScan.cc LicenseBox.cc \
+                    PreferencesBox.cc \
 	       			GnoScan.hh GnoMainWindow.hh TcpScan.hh LicenseBox.hh \
+                    PreferencesBox.hh \
                     getopt.c getopt.h getopt1.c

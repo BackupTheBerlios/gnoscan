@@ -1,6 +1,13 @@
 GnoScan ChangeLog
 -=-=-=-=-=-=-=-=-
 
+
+Fri Feb  9 21:30:50 GMT+1 2001  Andreas Bauer  <baueran@users.berlios.de>
+
+  - Added rudimentary preferences dialog. No functionality yet, merely the
+    GUI is there.
+
+
 Wed Feb  7 19:48:58 GMT+1 2001  Andreas Bauer  <baueran@users.berlios.de>
 
   - Added pixmaps/ to distribution and added the pixmap in it to the "Scan"

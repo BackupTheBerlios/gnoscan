@@ -43,6 +43,7 @@
 #include <gnome--/dialog.h>
 #include "config.h"
 #include "GnoMainWindow.hh"
+#include "PreferencesBox.hh"
 #include "TcpScan.hh"
 
 
@@ -53,9 +54,6 @@ namespace gnomain {
 
   GnoMainWindow::GnoMainWindow(string name): Gnome::App(name, name)
   {
-    // aboutBox = NULL;
-    licenseBox = NULL;
-
     try {
       // Initialise application and menus
       init();
@@ -249,7 +247,12 @@ namespace gnomain {
 
     // Main scanning process
     try {
-      const vector<scan::scanResult>* results = scannerObj.scan(ops.start->get_value_as_int(), ops.end->get_value_as_int(), ops.server->get_text());
+      const vector<scan::scanResult>* results = scannerObj.scan(ops.start->get_value_as_int(),   // Start port
+								ops.end->get_value_as_int(),     // End port
+								-1,                              // Source port
+								true,                            // Extra info?
+								ops.server->get_text(),          // Host
+								"");                             // Netmask
       vector<scan::scanResult>::const_iterator curResult = results->begin();
       vector<string> listItems;
       char openPort[32];  // Not nice but more than large enough...
@@ -298,14 +301,8 @@ namespace gnomain {
     authors.push_back(author);
     
     Gnome::About* aboutBox = manage(new Gnome::About((string)PACKAGE, (string)VERSION, copyright, authors, description, 0));
-    aboutBox->destroy.connect(slot(this,&GnoMainWindow::destroyAboutBox));
+    aboutBox->destroy.connect(slot(this,&GnoMainWindow::destroyDialog));
     aboutBox->run();
-  }
-  
-  
-  void GnoMainWindow::destroyAboutBox(void) {
-    statusBar->pop(statusBar->get_context_id((string)PACKAGE));
-    statusBar->push(statusBar->get_context_id((string)PACKAGE), "Ready");
   }
   
   
@@ -313,28 +310,25 @@ namespace gnomain {
     statusBar->pop(statusBar->get_context_id((string)PACKAGE));
     statusBar->push(statusBar->get_context_id((string)PACKAGE), "GnoScan License");
 
-    if (licenseBox != NULL) {
-      Gdk_Window licenseWindow(licenseBox->get_window());
-      licenseWindow.show();
-      licenseWindow.raise();
-    }
-    else {
-      licenseBox = manage(new LicenseBox());
-      licenseBox->destroy.connect(slot(this,&GnoMainWindow::destroyLicenseBox));
-      licenseBox->show();
-    }
+    LicenseBox* licenseBox = manage(new LicenseBox());
+    licenseBox->destroy.connect(slot(this,&GnoMainWindow::destroyDialog));
+    licenseBox->run();
   }
   
 
-  void GnoMainWindow::destroyLicenseBox(void) {
-    licenseBox = NULL;
+  void GnoMainWindow::destroyDialog(void) {
     statusBar->pop(statusBar->get_context_id((string)PACKAGE));
     statusBar->push(statusBar->get_context_id((string)PACKAGE), "Ready");
   }
-  
+
 
   void GnoMainWindow::displayOptions() {
-    
+    statusBar->pop(statusBar->get_context_id((string)PACKAGE));
+    statusBar->push(statusBar->get_context_id((string)PACKAGE), "Preferences");
+
+    PreferencesBox* prefs = manage(new PreferencesBox());
+    prefs->destroy.connect(slot(this,&GnoMainWindow::destroyDialog));    
+    prefs->run();
   }
   
 }

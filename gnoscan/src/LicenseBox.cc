@@ -22,6 +22,7 @@
 #include <gtk--/button.h>
 #include <gnome--.h>
 #include "LicenseBox.hh"
+#include "config.h"
 
 
 LicenseBox::~LicenseBox() {
@@ -30,7 +31,7 @@ LicenseBox::~LicenseBox() {
 
 LicenseBox::LicenseBox() {
   set_policy(false, false, false);
-  set_title ("GnoScan License");
+  set_title ((string)PACKAGE + (string)" License");
   set_border_width(0);
   set_usize(430, 300);
   

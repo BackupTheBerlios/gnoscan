@@ -1,6 +1,8 @@
 GnoScan TODO
 -=-=-=-=-=-=
 
+- Fix up path for the icons of the "Scan" button, i.e. make it dynamic
+
 - Domain names are not yet resolved properly - why?!
 
 - Add facility to scan entire subnets
