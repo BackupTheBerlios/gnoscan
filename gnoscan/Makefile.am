@@ -20,7 +20,7 @@
 
 AUTOMAKE_OPTIONS = dist-shar dist-zip dist-tarZ
 
-SUBDIRS = macros src
+SUBDIRS = macros src pixmaps
 
 EXTRA_DIST = TODO
 

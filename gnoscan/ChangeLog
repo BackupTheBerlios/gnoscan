@@ -1,6 +1,12 @@
 GnoScan ChangeLog
 -=-=-=-=-=-=-=-=-
 
+Wed Feb  7 19:48:58 GMT+1 2001  Andreas Bauer  <baueran@users.berlios.de>
+
+  - Added pixmaps/ to distribution and added the pixmap in it to the "Scan"
+    button
+
+
 Tue Feb  6 18:43:18 GMT+1 2001  Andreas Bauer  <baueran@users.berlios.de>
 
   - Fixed a very nasty bug in which open sockets did not get closed after

@@ -32,6 +32,8 @@
 #include <gtk--/adjustment.h>
 #include <gtk--/scrolledwindow.h>
 #include <gtk--/statusbar.h>
+#include <gtk--/pixmap.h>
+#include <gtk--/combo.h>
 #include <gtk--/clist.h>
 #include <gtk--/base.h>
 #include <gnome--.h>
@@ -51,7 +53,7 @@ namespace gnomain {
 
   GnoMainWindow::GnoMainWindow(string name): Gnome::App(name, name)
   {
-    aboutBox = NULL;
+    // aboutBox = NULL;
     licenseBox = NULL;
 
     try {
@@ -85,10 +87,19 @@ namespace gnomain {
       Gtk::HBox* serverHBox = manage(new Gtk::HBox());
       Gtk::Label* serverLabel = manage(new Gtk::Label("Host:"));
       Gtk::Entry* serverEntry = manage(new Gtk::Entry(40));
-      serverEntry->set_text("192.168.1.2");
       serverHBox->pack_start(*serverLabel, FALSE, FALSE, STD_PADDING);
       serverHBox->pack_start(*serverEntry, TRUE, TRUE, STD_PADDING);
       
+      // Netmask combo box and label
+      char *netmasks[5] = { "<check only specified host>", "255.255.255.0", "255.255.0.0", "255.0.0.0", "" };
+      Gtk::HBox* netmaskHBox = manage(new Gtk::HBox());
+      Gtk::Label* netmaskLabel = manage(new Gtk::Label("Netmask:"));
+      Gtk::Combo* netmaskCombo = manage(new Gtk::Combo());
+      netmaskHBox->pack_start(*netmaskLabel, FALSE, FALSE, STD_PADDING);
+      netmaskHBox->pack_start(*netmaskCombo, TRUE, TRUE, STD_PADDING);
+      netmaskCombo->set_popdown_strings(netmasks);
+      netmaskCombo->get_entry()->set_editable(FALSE);
+
       // Port range spin buttons and frame
       Gtk::HBox* portHBox = manage(new Gtk::HBox());
       Gtk::VBox* portVBox = manage(new Gtk::VBox());
@@ -138,13 +149,19 @@ namespace gnomain {
       scanHBox2->pack_start(*scanFrame, TRUE, TRUE, STD_PADDING);
       
       // Confirm buttons as well as a separator line
+      Gtk::HBox* scanButtonBox = manage(new Gtk::HBox());
       Gtk::HButtonBox* confirmButtonBox = manage(new Gtk::HButtonBox());
       confirmButtonBox->set_border_width(STD_PADDING_HALF);
       confirmButtonBox->set_spacing(STD_PADDING);
       confirmButtonBox->set_layout(GTK_BUTTONBOX_END);
       Gtk::Separator* sep = manage(new Gtk::HSeparator()); // h-separator
       Gtk::Button* cancelButton = manage(new Gnome::StockButton(GNOME_STOCK_BUTTON_CANCEL));
-      Gtk::Button* scanButton = manage(new Gtk::Button("Scan"));
+      Gtk::Pixmap* scanPixmap = manage(new Gtk::Pixmap("../pixmaps/tb_search.xpm"));
+      Gtk::Label* scanLabel = manage(new Gtk::Label("Scan"));
+      scanButtonBox->pack_start(*manage(static_cast<Gtk::Widget*>(scanPixmap)));
+      scanButtonBox->pack_start(*scanLabel);
+      Gtk::Button* scanButton = manage(new Gtk::Button());
+      scanButton->add(*scanButtonBox);
       confirmButtonBox->add(*scanButton);
       confirmButtonBox->add(*cancelButton);
       
@@ -155,6 +172,7 @@ namespace gnomain {
       // Draw and arrange all widgets
       Gtk::VBox* vBox = manage(new Gtk::VBox());
       vBox->pack_start(*serverHBox, TRUE, FALSE, STD_PADDING);  // EXPAND, FILL, PADDING
+      vBox->pack_start(*netmaskHBox, FALSE, FALSE, 0);
       vBox->pack_start(*portHBox, FALSE, FALSE, STD_PADDING);
       vBox->pack_start(*scanHBox2, FALSE, FALSE, STD_PADDING);
       vBox->pack_start(*sep, FALSE, FALSE, STD_PADDING_HALF);
@@ -253,10 +271,10 @@ namespace gnomain {
       }
     }
     catch (scan::DnsError) {
-      Gnome::Dialogs::error("DNS lookup error. Could not resolve domain name.");
+      Gnome::Dialogs::error("DNS lookup error. Could not resolve host name.");
     }
     catch (scan::SocketFailed) {
-      Gnome::Dialogs::error("Could not create socket for host communication.");
+      Gnome::Dialogs::error("Networking error. Could not create socket.");
     }
     catch (...) {
       throw;
@@ -270,31 +288,22 @@ namespace gnomain {
   
   
   void GnoMainWindow::displayAboutBox(void) {
+    vector<string> authors;
+    string copyright = "Copyright (c) 2001 Andreas Bauer";
+    string author = "Andreas Bauer <baueran@users.berlios.de>";
+    string description = "Use GnoScan to scan and secure your network.\nSee http://gnoscan.berlios.de/ for further information.";
+      
     statusBar->pop(statusBar->get_context_id((string)PACKAGE));
     statusBar->push(statusBar->get_context_id((string)PACKAGE), "About GnoScan");
-
-    if (aboutBox != NULL) {
-      Gdk_Window aboutWindow(aboutBox->get_window());
-      aboutWindow.show();
-      aboutWindow.raise();
-    }
-    else {
-      vector<string> authors;
-      string copyright =   "Copyright (c) 2001 Andreas Bauer";
-      string author =      "Andreas Bauer <baueran@users.berlios.de>";
-      string description = "Use GnoScan to scan and secure your network.\nSee http://gnoscan.berlios.de/ for further information.";
-      
-      authors.push_back(author);
-      aboutBox = manage(new Gnome::About((string)PACKAGE, (string)VERSION, copyright, authors, description, 0));
-      aboutBox->set_parent(*this);
-      aboutBox->destroy.connect(slot(this,&GnoMainWindow::destroyAboutBox));
-      aboutBox->show();
-    }
+    authors.push_back(author);
+    
+    Gnome::About* aboutBox = manage(new Gnome::About((string)PACKAGE, (string)VERSION, copyright, authors, description, 0));
+    aboutBox->destroy.connect(slot(this,&GnoMainWindow::destroyAboutBox));
+    aboutBox->run();
   }
   
   
   void GnoMainWindow::destroyAboutBox(void) {
-    aboutBox = NULL;
     statusBar->pop(statusBar->get_context_id((string)PACKAGE));
     statusBar->push(statusBar->get_context_id((string)PACKAGE), "Ready");
   }

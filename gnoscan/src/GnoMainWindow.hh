@@ -53,7 +53,6 @@ namespace gnomain {
     vector<Gnome::UI::Info> menuFile;
     vector<Gnome::UI::Info> menuEdit;
     vector<Gnome::UI::Info> menuHelp;
-    Gnome::About* aboutBox;
     Gtk::Statusbar* statusBar;
     LicenseBox* licenseBox;
     Gtk::CList* scanCList;

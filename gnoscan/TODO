@@ -8,3 +8,5 @@ GnoScan TODO
 - Add specific source port for scans
 
 - Add Posix Threads for scanning to release the pressed "Scan" button
+
+- Implement GNU's gettext stuff
